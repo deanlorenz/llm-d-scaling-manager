@@ -56,6 +56,11 @@
   question is settled: the whole `.claude/skills` folder is linked to `session-tracking/claude-skills`, upstream's `pr-review` is not
   linked or handled per worktree; my earlier "missing untracked pr-review copy" item is withdrawn).
   `conventions/archived/` (11 files) was left behind on purpose.
+  USER RULINGS 2026-11-25 on the findings: (a) rr-3 rows 9 and 73 are migration-related rule corrections, NOT suggestions: diff drafted in
+  `.session/drafts/rule-fixes-9-73-2026-11-25.diff` (CONVENTIONS.md:110, conv-install-to-session-tracking L177/L180, resume-mission L22/69/154);
+  to be applied in `policy-writer` (after rr-4 finishes) and installed incrementally; (b) pr-review/upstream skills policy: upstream skills exist in
+  `main/.claude/skills`; default = disabled by not linking; opt-in = link a chosen one from `main` into `session-tracking`; no pr-review memory note;
+  rr-4 (`.session/task-rr-4.md`, report `.session/review-pr-review-2026-11-25.md`) checks all rules against it.
   rr-3 RESULT (2026-11-25; `.session/review-rules-verified-2026-11-25.md`, suggestion drafts `.session/drafts/suggestions-from-rr3-2026-11-25.md`):
   all 84 rr-1 findings re-checked on the actual lines: 66 CONFIRMED, 7 FALSE, 11 STALE. Of the 66: 53 rule-quality items that exist
   identically in the old rules (32 suggestion drafts, NOT submitted: user said wait until the migration ends), 11 SETTLED (pr-review,
@@ -70,7 +75,7 @@
   (cherry-picks, `LAST_SHA` = f00935a7). The "first install" authorization is consumed.
 - [x] 6. This worktree (created 2026-11-25); `.session/` ported
 - [ ] 7. (partly done 2026-11-25: skills links, `.bob` links, `repo/info/exclude` entries, `missions/incubation-migration/` links and empty
-  `suggestion-box/` in `session-tracking` are in place, verified; STILL OPEN: root `CLAUDE.md`, `.code-workspace`; drafts in `.session/drafts/root/`, not applied; `.bob/skills` is now a dir-link to `session-tracking/claude-skills` like `.claude/skills`, user 2026-11-25) Root `CLAUDE.md` (an anchor; tested: a root CLAUDE.md in the non-git container loads in every
+  `suggestion-box/` in `session-tracking` are in place, verified; DONE 2026-11-25: root `CLAUDE.md` (two lines, applied at the container root; user approved; tested: a root-started session that reads a file in `main/` gets `main`'s CLAUDE.md -> AGENTS.md on demand); the `.code-workspace` is user-owned and untracked (draft in `.session/drafts/root/`, add a folder per new mission worktree; not applied yet); `.bob/skills` is now a dir-link to `session-tracking/claude-skills` like `.claude/skills`, user 2026-11-25) Root `CLAUDE.md` (an anchor; tested: a root CLAUDE.md in the non-git container loads in every
   worktree, and upstream main's own CLAUDE.md = "see @AGENTS.md" loads as well), `llm-d-scaling-manager.code-workspace`
   (session-tracking first), `repo/info/exclude` entries (`.claude/skills`, `.bob`, `*.wip`). Skills links only AFTER
   the first install (user, 2026-11-25).
