@@ -46,7 +46,9 @@
   Migration does NOT fix rules. Rule issues found along the way are written up as suggestion-box entries (drafts in
   `.session/drafts/`, submitted after the migration, the user said wait) and fixed by a new policy-writer session. User ruling on
   rr-1's decisions: D1 yes (the `missions/` index, suggestion box and pending-commits flow live in `session-tracking`);
-  D2, D4, D5 are rule-quality questions already handled in the old policy-writer mission, not migration decisions; D3 waits.
+  D2-D5 are rule-quality questions, not migration decisions; they are VALID open items for the policy-writer mission and
+  must not be dropped: each becomes a suggestion-box draft after the refreshed review verifies it (rr-2 found D4/D5/D2 are
+  NOT addressed in the old repo either; my earlier note "already handled" was wrong). D3 waits for the end of the migration.
   rr-2 RESULT (2026-11-25, `.session/review-staleness-2026-11-25.md`): the new rules ARE the newest that exist (old policy-writer
   d23d9d7e3 and old session-tracking 36d27bcfb have identical trees; nothing newer anywhere in the old repo). rr-1 was partly
   wrong/stale (e.g. PR-prep rebase claim). Findings B2, B4-B7 exist identically in the old repo: suggestion-box material, not
