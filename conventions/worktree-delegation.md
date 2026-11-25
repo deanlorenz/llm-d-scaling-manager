@@ -102,12 +102,12 @@ completion.
 
 **Extra pre-steps:**
 ```bash
-git worktree add worktrees/<name> -b <branch> <start-point>
+git worktree add ../<name> -b <branch> <start-point>   # sibling of the mission worktree, directly under the workspace root
 # Write task file to the new worktree (parent already committed it in step 1 above;
 # now also make it available at the coder's path):
-cp .session/task-<id>.md worktrees/<name>/.session/task-<id>.md
-git -C worktrees/<name> add .session/task-<id>.md
-git -C worktrees/<name> commit -m "task: <id> (copy for coder worktree)"
+cp .session/task-<id>.md ../<name>/.session/task-<id>.md
+git -C ../<name> add .session/task-<id>.md
+git -C ../<name> commit -m "task: <id> (copy for coder worktree)"
 ```
 
 **Launch:** isolation omitted. Pass the absolute worktree path in the launch prompt.
@@ -144,7 +144,7 @@ setup — the ephemeral path is not known ahead of time. The coder verifies bran
 1. If the coder produced ledger files or other `.session/` content that must survive,
    copy them to the mission's own `.session/` **before** removing the worktree:
    ```bash
-   cp <ephemeral-path>/.session/<slug>.md worktrees/<mission>/.session/
+   cp <ephemeral-path>/.session/<slug>.md ../<mission>/.session/
    ```
 2. Remove the ephemeral worktree to free the branch:
    ```bash

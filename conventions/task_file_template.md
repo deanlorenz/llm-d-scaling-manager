@@ -5,7 +5,7 @@ This is the full field set. For field authoring guidance see `conventions/tasks.
 
 ```
 Name: <session-slug>
-Conventions: worktrees/session-tracking/CONVENTIONS.md
+Conventions: session-tracking/CONVENTIONS.md
 What / goal / mission: <one or two sentences>
 Worktree: <name or "ephemeral — assigned at launch">
 Path: <absolute-path or "unknown — verify branch instead">

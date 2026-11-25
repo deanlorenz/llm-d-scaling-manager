@@ -52,7 +52,7 @@ git ls-files FILE_PATH
 
 ```bash
 # Check session-tracking history
-git log --oneline -10 -- worktrees/session-tracking/
+git log --oneline -10 -- session-tracking/
 # Check recent STATE files for any active session that might own it
 git show session-tracking:.session/STATE.md 2>/dev/null || true
 ```

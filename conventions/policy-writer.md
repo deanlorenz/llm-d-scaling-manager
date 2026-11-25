@@ -7,10 +7,10 @@ canonical `.claude/skills/` stored on the `session-tracking` branch.
 
 ## Working branch and production
 
-- `policy-writer` is a mission owner like any other. It works only in `worktrees/policy-writer`.
+- `policy-writer` is a mission owner like any other. It works only in `policy-writer`.
 - Its output is rules and skills, not code.
 - `session-tracking` is the production branch of those rules and skills. Sessions read rules from it and use skills linked to it.
-- Never edit, draft, or iterate in `session-tracking`. Draft, review, and commit in `worktrees/policy-writer`.
+- Never edit, draft, or iterate in `session-tracking`. Draft, review, and commit in `policy-writer`.
 - Rules and skills reach `session-tracking` only through an authorized install.
 - Install only `CONVENTIONS.md`, `conventions/`, `claude-skills/`, and `bob/`.
 - Never install `backup_rules/`, `.session/`, `.claude/`, or `.bak` files.
@@ -26,7 +26,7 @@ canonical `.claude/skills/` stored on the `session-tracking` branch.
 ## Responsibilities & Scope
 
 - After verification, tells the user which rule or skill files changed and asks whether to install them
-  in `worktrees/session-tracking`.
+  in `session-tracking`.
 - Installs only after the user explicitly authorizes that installation.
 - Approval to draft, review, commit, or push does not authorize installation.
 - Edits to `SKILL.md` and to settings files prompt the user through an `ask` rule. If an edit goes through with no prompt, stop and tell the user.
@@ -62,7 +62,7 @@ agentbus_fetch_since(topic="session-tracking.pending-commits", since_seq=0)
 ```
 
 For each unprocessed note found:
-1. Inspect git status in `worktrees/session-tracking` for the described changes (e.g. `missions/<name>/`).
+1. Inspect git status in `session-tracking` for the described changes (e.g. `missions/<name>/`).
 2. Review the exact paths and file types before staging. Do not delete, move, or overwrite an artifact
    without explicit authorization from its owner or the user.
 3. Commit only the reviewed maintenance artifacts on the `session-tracking` branch:
@@ -80,5 +80,5 @@ If no pending notes exist, proceed with standard mission tasks.
 2. **Reviewing Suggestions:**
 1. Read unprocessed suggestion files (`YYYY-MM-DD-HHMM-<mission>.md`).
 2. Decide whether the finding warrants a global rule in `CONVENTIONS.md`, a situational file in `conventions/`, or belongs only in that mission's local spec.
-3. Draft modifications in `worktrees/policy-writer`.
+3. Draft modifications in `policy-writer`.
 4. Prefix processed files with `processed-` in `session-tracking/suggestion-box/`. Tracked entry: `git mv`. Untracked entry: `mv`, then `git add` the new name.

@@ -23,7 +23,7 @@ When a default fails, try the other persistent runner (Bob for a CurveBender def
 
 Setup facts:
 - The `curvebender <model-id> [claude args]` function lives in `~/.bash_aliases` and needs `CURVEBENDER_BASE_URL` and `CURVEBENDER_API_KEY`. Aliases such as `cb-deepseek4` do not expand in a non-interactive shell, so always call the function inside `bash -c 'source ~/.bash_aliases >/dev/null 2>&1; curvebender …'`.
-- The working directory must be under `/home/dean/code/llm-d/dean-llmd-scaler-sandbox`. Agentbus registers by path prefix (`~/.agentbus/repos.json`); a directory outside it (for example `/tmp`) has no agentbus.
+- The working directory must be under the workspace root registered in `~/.agentbus/repos.json` (the directory that contains `session-tracking`; currently `/home/dean/code/llm-d/llm-d-scaling-manager`, bus `llmd-sm`). Agentbus registers by path prefix (`~/.agentbus/repos.json`); a directory outside it (for example `/tmp`) has no agentbus.
 - Models in use: coders `rits/deepseek-ai/DeepSeek-V4.1-Flash-1017`; alternative `rits/zai-org/glm-5-3`.
 - The token is part of the process arguments (`--settings` JSON), so it is visible in `ps` while the worker runs.
 - Ignore `unrecognized_model` messages on stderr and the reported cost.

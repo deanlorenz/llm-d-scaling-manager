@@ -93,7 +93,7 @@ ls "$TRACKING/missions/"
   - Background / subagent: report ambiguity to the parent session via agentbus.
 - **Empty arguments:** list all mission directories and ask the user which one.
 
-Call the chosen mission `$MISSION_NAME`. The worktree path is `worktrees/$MISSION_NAME`.
+Call the chosen mission `$MISSION_NAME`. The worktree path is `$(dirname "$TRACKING")/$MISSION_NAME` (worktrees are siblings of `session-tracking`).
 Call it `$MISSION_WT`. Tracking files live at `$MISSION_WT/.session/`. Verify that
 `$MISSION_WT/.session/STATE.md` exists before treating this as an existing mission. If it exists,
 read its Orientation fields and perform the Case 2 confirmation. If the selected index entry points

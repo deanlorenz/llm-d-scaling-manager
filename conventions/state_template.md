@@ -11,10 +11,10 @@ For which information belongs in STATE vs spec vs ledger see `conventions/state-
 
 ## Orientation
 
-- **Conventions:** `worktrees/session-tracking/CONVENTIONS.md`
+- **Conventions:** `session-tracking/CONVENTIONS.md`
   *(read this first, before any other file)*
 - **What / goal / mission:** <what this session or mission is for>
-- **Worktree:** `worktrees/<name>` (branch `<branch>`)
+- **Worktree:** `<name>` (branch `<branch>`)
 - **Base:** <optional: the ref this branch follows, e.g. `upstream/main`; `resume-mission` checks whether it moved>
 - **Role / scope:** <role and authority boundary>
 - **Ledger / log:** active `.session/<slug>.md`; captured retired `.session/ledger/<slug>.md`

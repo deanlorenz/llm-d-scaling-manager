@@ -36,10 +36,10 @@ Then send the final report.
 
 ## Read first
 
-The conventions are in the `session-tracking` worktree, under `worktrees/session-tracking/`. Read these before any edit:
-- `worktrees/session-tracking/CONVENTIONS.md`: ownership and data-safety rules.
-- `worktrees/session-tracking/claude-skills/conv-state-vs-ledger/SKILL.md`: what belongs in STATE, the spec, and the ledger, and the settled-or-open rule.
-- `worktrees/session-tracking/claude-skills/conv-wip-editing/SKILL.md`: the `.wip` claim, edit, release protocol.
+The conventions are in the `session-tracking` worktree, under `session-tracking/`. Read these before any edit:
+- `session-tracking/CONVENTIONS.md`: ownership and data-safety rules.
+- `session-tracking/claude-skills/conv-state-vs-ledger/SKILL.md`: what belongs in STATE, the spec, and the ledger, and the settled-or-open rule.
+- `session-tracking/claude-skills/conv-wip-editing/SKILL.md`: the `.wip` claim, edit, release protocol.
 
 If one of them cannot be read, publish the failure on `Out:` and stop.
 

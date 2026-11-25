@@ -90,7 +90,7 @@ A focused agent assigned to process exactly one ledger file:
 
 ## Doc-Reference Path Rule
 
-Every reference across tracked docs must be a repo-root-relative path
-(e.g. `worktrees/policy-writer/.session/STATE.md`) — never absolute, never a bare filename.
+Every reference across tracked docs must be a workspace-root-relative path
+(e.g. `policy-writer/.session/STATE.md`) — never absolute, never a bare filename.
 State which worktree or branch the path resolves in whenever that is not obvious: the same path can point to
 different content on different branches.

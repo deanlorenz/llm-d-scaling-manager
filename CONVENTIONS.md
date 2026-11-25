@@ -51,6 +51,7 @@ Read the matching file only when its trigger occurs — not speculatively.
 ## Repo layout
 
 ```text
+<workspace-root>/                  ← container, not a git repo; repo/ is the bare clone, every worktree is a direct child
 session-tracking/                  ← global policy worktree; read-only unless specifically authorized
   CONVENTIONS.md                   ← this file
   conventions/                     ← situational rules
@@ -64,13 +65,13 @@ session-tracking/                  ← global policy worktree; read-only unless 
     custom_modes.yaml
   missions/                        ← read-only convenience symlinks
     <mission-name>/
-      STATE.md -> worktrees/<mission-name>/.session/STATE.md
-      <plan>.md -> worktrees/<mission-name>/.session/<plan>.md
-      ledgers/ -> worktrees/<mission-name>/.session/
+      STATE.md -> <mission-name>/.session/STATE.md
+      <plan>.md -> <mission-name>/.session/<plan>.md
+      ledgers/ -> <mission-name>/.session/
 
-worktrees/<mission-name>/          ← mission branch/worktree
+<mission-name>/                    ← mission branch/worktree
   .session/                        ← mission state, ledgers, and internal plans; never in a PR branch
-  .claude/skills -> <abs-path>/worktrees/session-tracking/claude-skills  ← dir-symlink
+  .claude/skills -> <abs-path>/session-tracking/claude-skills  ← dir-symlink
   .bob/custom_modes.yaml -> session-tracking/bob/custom_modes.yaml; .bob/skills/<name> -> session-tracking/claude-skills/<name>  ← links, never tracked
   <normal code tree>               ← mission output
 ```
@@ -82,7 +83,7 @@ worktrees/<mission-name>/          ← mission branch/worktree
   git show <mission-name>:.session/STATE.md
   ```
 - **If `.claude/skills` is missing or broken in your worktree:** skills live at
-  `worktrees/session-tracking/claude-skills/` — read any `SKILL.md` directly from there
+  `session-tracking/claude-skills/` — read any `SKILL.md` directly from there
   until the symlink is fixed. Invoke `conv-feature-worktree-setup` to repair it.
 - Do not edit another mission's symlinks — report broken links via `session-tracking/suggestion-box/`.
 

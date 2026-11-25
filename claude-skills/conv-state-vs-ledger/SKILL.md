@@ -37,9 +37,9 @@ Use this template for all session types. For field authoring guidance see `conv-
 
 ## Orientation
 
-- **Conventions:** `worktrees/session-tracking/CONVENTIONS.md`
+- **Conventions:** `session-tracking/CONVENTIONS.md`
 - **What / goal / mission:** <one or two sentences>
-- **Worktree:** `worktrees/<name>` (branch `<branch>`)
+- **Worktree:** `<name>` (branch `<branch>`)
 - **Base:** <optional: the ref this branch follows, e.g. `upstream/main`; `resume-mission` checks whether it moved>
 - **Role / scope:** <role and authority boundary>
 - **Ledger / log:** active `.session/<slug>.md`; captured `.session/ledger/<slug>.md`

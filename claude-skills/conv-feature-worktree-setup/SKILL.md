@@ -38,7 +38,7 @@ mkdir -p MISSION_WT/.session/ledger
 
 Verify the directory exists. If `MISSION_WT/.session/STATE.md` already exists, do not overwrite it — skip to step 2.
 
-If STATE.md is missing, create a minimal one using the template from `worktrees/session-tracking/conventions/state-vs-ledger.md`. Fill in the Orientation fields only; leave Execution empty. Do not invent content.
+If STATE.md is missing, create a minimal one using the template from `session-tracking/conventions/state-vs-ledger.md`. Fill in the Orientation fields only; leave Execution empty. Do not invent content.
 
 ### 2. Commit `.session/` to the mission branch
 
@@ -55,7 +55,7 @@ If nothing to commit (already tracked), skip.
 
 Skill discovery does not walk above the worktree root — each worktree needs its own `.claude/skills` pointing at the shared skills source.
 
-**Check first:** if `MISSION_WT/.claude/skills` already exists and is a directory symlink resolving to `worktrees/session-tracking/claude-skills`, step 3 is already done — skip to step 4.
+**Check first:** if `MISSION_WT/.claude/skills` already exists and is a directory symlink resolving to `session-tracking/claude-skills`, step 3 is already done — skip to step 4.
 
 **If `pr-review` is a tracked git file in this worktree** (run `git -C MISSION_WT ls-files .claude/skills/pr-review` to check), do not replace the `.claude/skills` directory — skip to step 4 and report this as a blocker.
 
@@ -92,7 +92,7 @@ for skill in MISSION_WT/.claude/skills/*/; do
 done
 ```
 
-All resolved paths must be under `worktrees/session-tracking/claude-skills/`. Report any broken or mis-targeted link.
+All resolved paths must be under `session-tracking/claude-skills/`. Report any broken or mis-targeted link.
 
 ### 4a. Set up `.bob` links
 

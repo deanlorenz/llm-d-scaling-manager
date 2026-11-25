@@ -5,7 +5,7 @@ description: Use when installing conventions, skills, or CONVENTIONS.md from pol
 
 # conv-install-to-session-tracking
 
-`session-tracking` is the production branch of rules and skills. `worktrees/policy-writer` is the working branch. An install moves reviewed, committed policy-writer commits into production. Nothing else goes.
+`session-tracking` is the production branch of rules and skills. `policy-writer` is the working branch. An install moves reviewed, committed policy-writer commits into production. Nothing else goes.
 
 **This skill runs as a subagent.** Installation is mechanical and self-contained — spawn a subagent to run the procedure. The subagent needs explicit authorization confirmation from you first.
 
@@ -44,8 +44,8 @@ You are installing reviewed `policy-writer` commits onto the production branch `
 Set these once (full paths; `HEAD_SHA` is the SHA the caller recorded):
 
 ```bash
-PW=<full path to worktrees/policy-writer>
-ST=<full path to worktrees/session-tracking>
+PW=<full path to policy-writer>
+ST=<full path to session-tracking>
 PATHS="CONVENTIONS.md conventions claude-skills bob"
 ```
 

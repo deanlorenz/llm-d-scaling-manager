@@ -60,7 +60,7 @@ opening a ledger, committing to git, or asking a question — may precede that c
 
 ## If you have no STATE file
 
-1. Read `worktrees/session-tracking/CONVENTIONS.md`.
+1. Read `session-tracking/CONVENTIONS.md`.
 2. Interact with the user to define the mission: name, worktree, goal, and your role.
 3. Once the mission is defined, create `.session/STATE.md` using the template in
    `conventions/state-vs-ledger.md`. Fill in what is known; leave execution fields empty
