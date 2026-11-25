@@ -47,6 +47,12 @@
   `.session/drafts/`, submitted after the migration, the user said wait) and fixed by a new policy-writer session. User ruling on
   rr-1's decisions: D1 yes (the `missions/` index, suggestion box and pending-commits flow live in `session-tracking`);
   D2, D4, D5 are rule-quality questions already handled in the old policy-writer mission, not migration decisions; D3 waits.
+  rr-2 RESULT (2026-11-25, `.session/review-staleness-2026-11-25.md`): the new rules ARE the newest that exist (old policy-writer
+  d23d9d7e3 and old session-tracking 36d27bcfb have identical trees; nothing newer anywhere in the old repo). rr-1 was partly
+  wrong/stale (e.g. PR-prep rebase claim). Findings B2, B4-B7 exist identically in the old repo: suggestion-box material, not
+  migration. Migration-specific: `missions/` and `suggestion-box/` absent in the new session-tracking, and the old untracked
+  `claude-skills/pr-review` copy (made the skills dir-symlink work over upstream's tracked pr-review) is absent in the new one.
+  `conventions/archived/` (11 files) was left behind on purpose.
 - [x] 5. `session-tracking` first install DONE 2026-11-25: root commit 194b528e from policy-writer@f00935a7 (34 files,
   tree ids verified equal, local, not pushed). It carries the rules BEFORE the review fixes (user, 2026-11-25: keep it,
   option 1): the fixes of 4a go through `policy-writer` and reach `session-tracking` by normal incremental installs
