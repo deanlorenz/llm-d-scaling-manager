@@ -19,7 +19,7 @@ disable-model-invocation: true
 Rules:
 - Read canonical `CONVENTIONS.md` from `session-tracking` first.
 - Read `conventions/session-start.md` second.
-- Never use the main repository's copy as fallback.
+- Never use a copy of the rules from any worktree other than `session-tracking` as a fallback.
 - Do not select a mission before reading both files.
 - Do not ask to continue the task before verifying mission, role, worktree, and takeover status.
 
@@ -66,7 +66,7 @@ Rules:
 - Verify `CONVENTIONS.md` and `conventions/session-start.md` were read.
 - Verify role/mission rules required by STATE were read.
 - Stop if either startup file is missing.
-- Do not use the main repository as fallback.
+- Do not use any worktree other than `session-tracking` as a fallback for these files.
 - Verify active worktree root and branch with `git worktree list`.
 - Read the candidate worktree's `.session/STATE.md` directly.
 
@@ -151,7 +151,7 @@ done
 
 Rules:
 - Resolved paths must be under `$TRACKING/claude-skills/`.
-- Links into the main repository or missing links are invalid.
+- Links that resolve anywhere else, and missing links, are invalid.
 - Repair links using `conv-feature-worktree-setup`.
 - Do not copy skills into mission worktrees.
 

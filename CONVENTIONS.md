@@ -107,7 +107,7 @@ session-tracking/                  ← global policy worktree; read-only unless 
 - **No in-place editing of anything**, except files you **100% own** — your own code file, your own plan, your own ledger append. Everything else: write new, then remove/replace old.
 - Never remove a file you do not own or did not create without explicit permission.
 - Before removing anything, verify its content is captured in the correct location. Do not lose data.
-- Archiving, moving, or renaming a convention or skill file is removing. The commit lists where each part of its content went, and a grep for the old path finds no live reference outside `conventions/archived/`.
+- Archiving, moving, or renaming a convention or skill file is removing. The commit lists where each part of its content went, and a grep for the old path finds no live reference.
 - Destructive actions need step-by-step approval: `git reset --hard`, `git rebase`, `rm -rf`, `git rm`, stash drop, and equivalents. A rebase needs the user's approval of the exact command each time; a PR branch is re-cut with `conv-pr-branch`, never rebased. If not 100% sure, preserve a backup first.
 - Before any `rm` or `rm -rf`: list the exact files first (`ls -la <path>`), confirm each entry is a symlink or a file you created and own, and verify no untracked content would be lost. Never use `rm -rf` on a directory unless you own every file in it and have listed them all.
 - Never edit files outside the mission and role you own.
