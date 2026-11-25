@@ -1,0 +1,129 @@
+---
+name: conv-background-agents
+description: Use only when a skill defines no default launch for a background agent, or its default launch does not work. Holds every runner with its exact launch command, and the fallback order.
+---
+
+# conv-background-agents
+
+Fallback reference. A skill that launches a background agent embeds its own default launch and runs it as written, without asking. The default is approved when the skill is edited. Read this skill only if the skill you are following has no default, or its default fails.
+
+Every launch, whatever the runner, needs: `In:` and `Out:` channels, the subscription command, and `Progress events:` in the task file (see `conv-agentbus` and `conv-tasks`).
+
+## Runners
+
+| Runner | Persistence | Use for |
+|---|---|---|
+| Claude Code on CurveBender | `--session-id` / `--resume` | coders (default) |
+| Bob CLI | `--resume <task-id>` | `ledger-capture`; coders if the default is changed back |
+| Native subagent (`Agent` tool) | none | short mechanical tasks (installs) |
+
+When a default fails, try the other persistent runner (Bob for a CurveBender default, CurveBender for a Bob default), then a native subagent. A skill that names its own order (for example `ledger-capture`: Bob, then CurveBender, then a Claude Haiku subagent) overrides this.
+
+## Claude Code on CurveBender
+
+Setup facts:
+- The `curvebender <model-id> [claude args]` function lives in `~/.bash_aliases` and needs `CURVEBENDER_BASE_URL` and `CURVEBENDER_API_KEY`. Aliases such as `cb-deepseek4` do not expand in a non-interactive shell, so always call the function inside `bash -c 'source ~/.bash_aliases >/dev/null 2>&1; curvebender …'`.
+- The working directory must be under `/home/dean/code/llm-d/dean-llmd-scaler-sandbox`. Agentbus registers by path prefix (`~/.agentbus/repos.json`); a directory outside it (for example `/tmp`) has no agentbus.
+- Models in use: coders `rits/deepseek-ai/DeepSeek-V4.1-Flash-1017`; alternative `rits/zai-org/glm-5-3`.
+- The token is part of the process arguments (`--settings` JSON), so it is visible in `ps` while the worker runs.
+- Ignore `unrecognized_model` messages on stderr and the reported cost.
+
+Launch a new session (record `<uuid>` in the task file as `Session ID:`):
+
+```bash
+U=$(cat /proc/sys/kernel/random/uuid)
+export P="$(cat <prompt-file>)"
+nohup bash -c "cd <worktree-path> && source ~/.bash_aliases >/dev/null 2>&1; curvebender <model-id> -p \"\$P\" --session-id $U --permission-mode auto --max-turns <n> --output-format json" > <logfile> 2>&1 < /dev/null &
+```
+
+Send a later instruction to the same session (same working directory, same model; new instruction in the prompt):
+
+```bash
+export P="<new instruction>"
+nohup bash -c "cd <worktree-path> && source ~/.bash_aliases >/dev/null 2>&1; curvebender <model-id> -p \"\$P\" --resume <uuid> --permission-mode auto --max-turns <n> --output-format json" > <logfile> 2>&1 < /dev/null &
+```
+
+Tested 2026-11-17 with this form: a coder created a file and committed it under `--permission-mode auto`, reported the commit as an agentbus heartbeat, and a later `--resume` continued the same session and committed again.
+
+Rules:
+- Use `--resume <uuid>`. Never `-c`: it skips sessions made with `-p`.
+- Never pass `--no-session-persistence`: it makes the session unresumable.
+- Wait for further instructions (tested 2026-11-17): the task file tells the worker, after reporting done, to poll its `In:` channel with `agentbus_fetch_since` and `sleep 15` between polls, for at most the number of tries the task file states. A message on `In:` is picked up within one poll. When the window ends the worker exits, and the parent resumes it with `--resume`.
+- `--input-format stream-json` also keeps a `-p` process reading stdin. Not tested here.
+- `nohup` and `< /dev/null` keep the worker alive after the launching shell call returns (tested). Survival after the parent session ends is not tested.
+- Model list: `curl -s -H "Authorization: Bearer $CURVEBENDER_API_KEY" "$CURVEBENDER_BASE_URL/v1/models"`. Not run by this skill's author.
+
+## Bob CLI
+
+Setup facts:
+- The workspace's `.bob/custom_modes.yaml` links to `session-tracking/bob/custom_modes.yaml`, and `.bob/skills/<name>` links to `session-tracking/claude-skills/<name>` (`conv-feature-worktree-setup`, step 4a). Never copy them and never track `.bob`. Tested 2026-11-18: Bob loads the mode and the skill through such links.
+- Bob edits only files its mode allows (`ledger-capture`: names ending `.wip`, claimed with `wip.sh`). Allowed commands are in `~/.bob/settings/settings.json` (`approvedCommands`).
+- The `bob-run` function in `~/.bash_aliases` wraps the headless form below.
+- Check for a running Bob worker with `ps -eo args | grep -v grep | grep -c 'bob run'`. Bob runs as a `node` process, so a check on the process name sees nothing.
+
+Persistent coder. `bob run --help`: `--resume [task-id]` resumes a specific task, so a first run has no `--resume`. Bob reports a Task ID (the `Task ID` line of its end-of-run summary in the default output; not checked for `-f stream-json`). Record it in the task file; losing it means the next run starts cold. `$PROMPT` is the instruction text, set by the caller.
+
+First run:
+
+```bash
+nohup bob run --accept-license --workspace <worktree-path> --mode <mode> \
+  -f stream-json "$PROMPT" \
+  > <logfile> 2>&1 < /dev/null &
+```
+
+A later instruction to the same task (the original resume form, kept, with `< /dev/null` added):
+
+```bash
+nohup bob run --accept-license --workspace <worktree-path> --mode <mode> \
+  --resume <task-id> -f stream-json "$PROMPT" \
+  > <logfile> 2>&1 < /dev/null &
+```
+
+Bounded headless run (used for `ledger-capture`, 2026-11-16, about 100 s):
+
+```bash
+timeout 600 bob run -w <workspace> --mode ledger-capture --max-turns 80 "$PROMPT" < /dev/null > <logfile> 2>&1
+```
+
+`spawn_subagent` is a Bob construct. Use it only when the parent session is Bob:
+
+```
+spawn_subagent(
+  description: "<the subagent instructions, variables filled in>",
+  name: "general"
+)
+```
+
+Model note: `claude-haiku-4-5`, or `$CONV_SUBAGENT_MODEL` when set.
+
+## Native subagent (the `Agent` tool in Claude Code)
+
+```
+Agent(
+  description: "<3-5 words>",
+  prompt: "<the instructions, variables filled in, with In:/Out: channels and the subscription command>",
+  subagent_type: "general-purpose",
+  model: "haiku"
+)
+```
+
+- It runs in the background and reports back when done. Do not edit the files it works on meanwhile.
+- `Explore` and `Plan` are one-shot and cannot be resumed.
+- It has no persistence across launches. Use CurveBender or Bob when the worker must be resumed.
+
+## Reviewers, `/code-review`, and research
+
+- **Code reviewer (role):** Claude Code on CurveBender with `rits/zai-org/glm-5-3`, a different model from the coder's (DeepSeek), so the review is a second opinion. Same launch form as the coder; the task file follows `conventions/reviewer.md`. GLM was smoke-tested 2026-11-18; the reviewer role has not yet run on a real task.
+- **`/code-review` (Claude-specific and heavy; independent of the current session):** a separate CurveBender DeepSeek process, the skill invoked from the prompt. Tested 2026-11-18 with a path target at level `low`: it ran headless in 65 s and returned its findings in the JSON `result`. The Claude Code docs say user-invoked skills work in `-p` mode when the prompt starts with `/skill-name`.
+
+  ```bash
+  export P="/code-review <low|medium|high> <PR number, branch, or path>"
+  nohup bash -c "cd <worktree-path> && source ~/.bash_aliases >/dev/null 2>&1; curvebender rits/deepseek-ai/DeepSeek-V4.1-Flash-1017 -p \"\$P\" --permission-mode auto --max-turns 40 --output-format json" > <logfile> 2>&1 < /dev/null &
+  ```
+
+- **Final review before a PR push (optional):** run `/code-review` in the main Claude session.
+- **Researcher:** `Agent(subagent_type: "general-purpose", model: "sonnet")`, never lighter than Sonnet. The built-in `Explore` agent follows the parent conversation's model (sub-agents docs), so do not assume it is Haiku-based; set `model` explicitly.
+
+## Adding a default launch to a skill
+
+Embed all of: the runner, the exact command, the `In:`/`Out:` channels and subscription command, the prompt skeleton, the progress events, the completion check, and the last line "If this does not work, see `conv-background-agents`."

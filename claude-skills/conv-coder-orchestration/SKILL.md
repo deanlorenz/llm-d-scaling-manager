@@ -1,0 +1,136 @@
+---
+name: conv-coder-orchestration
+description: Use when about to dispatch, launch, or orchestrate a coder agent or any background worker.
+---
+
+# conv-coder-orchestration
+
+Runs in your own session (mission-owner context). Apply before launching any worker.
+
+## Worker types
+
+| Type | When to use |
+|---|---|
+| **Foreground** | Task needs real-time steering or direct user visibility |
+| **Background** | Self-contained task; only the result matters |
+| **Persistent CLI** | Persistent context across multiple invocations needed |
+
+## Before any launch
+
+1. Write and commit the task file. Use `conv-tasks` / `conventions/task_file_template.md`.
+2. Assign `In:` and `Out:` agentbus channels — put both in the task file and launch prompt.
+3. Pick a worktree setup (default: `same-worktree`):
+
+| Setup | Use when |
+|---|---|
+| **same-worktree** | **Default.** Parent already in the correct worktree; no branch isolation needed. |
+| **checkout-branch** | Need branch isolation: sandboxed coder, durable commits, zero visible effect on open worktrees. |
+| **own-worktree** | Branch must stay checked out at a stable visible path after finishing. |
+
+**Concurrency:** no more than one coder active per worktree/branch, ever. Track the active coder in mission STATE.
+
+---
+
+## same-worktree — default path (inline mechanics)
+
+No branch prep, no separate worktree. Coder operates directly on the mission branch.
+
+### Parent pre-steps
+
+```bash
+# 1. Write task file and commit it
+git add .session/task-<id>.md && git commit -m "task: <id>"
+TASK_SHA=$(git rev-parse HEAD)
+```
+
+Record `TASK_SHA`, branch name, and worktree path in the launch prompt.
+Mark the branch as "in use by coder `<id>`" in mission STATE.
+
+### Coder startup (every path — do not skip)
+
+Instruct the coder to run these steps before any work:
+
+**a.** Verify worktree path:
+```bash
+git rev-parse --show-toplevel   # must match Path in task file
+```
+
+**b.** Verify branch:
+```bash
+git branch --show-current   # must match Branch in task file
+```
+
+**c.** Verify task file; cherry-pick if not present:
+```bash
+test -f .session/task-<id>.md || git cherry-pick <TASK_SHA>
+```
+
+**d.** Exclude `.session/` from git tracking in this worktree:
+```bash
+WTID=$(basename "$(git rev-parse --git-dir)")
+echo ".session/" >> "$(git rev-parse --git-common-dir)/worktrees/$WTID/info/exclude"
+```
+
+**e.** Fail closed: if any of a–d cannot be completed, stop. Publish exact failure to `Out:` and do not proceed.
+
+**f.** Read `.session/task-<id>.md` and begin work.
+
+### Launch
+
+Default: Claude Code on CurveBender (a session you can resume).
+
+```bash
+U=$(cat /proc/sys/kernel/random/uuid)      # record this in the task file as "Session ID:"
+export P="$(cat <prompt-file>)"            # points at .session/task-<id>.md; carries In:/Out: and the subscription command
+nohup bash -c "cd <worktree-path> && source ~/.bash_aliases >/dev/null 2>&1; curvebender rits/deepseek-ai/DeepSeek-V4.1-Flash-1017 -p \"\$P\" --session-id $U --permission-mode auto --max-turns <n> --output-format json" > <logfile> 2>&1 < /dev/null &
+```
+
+Record `Session ID: <uuid>` in the task file before launch. Without it the next instruction starts cold, with no prior context.
+
+Later instruction to the same coder: the same command with `--resume <uuid>` in place of `--session-id`, in the same worktree and with the same model. Never `-c`; never `--no-session-persistence`.
+
+To keep a coder available after it reports done, the task file tells it to poll its `In:` channel (`agentbus_fetch_since`, `sleep 15` between polls) for the number of tries it states, then exit. Resume it after that.
+
+If this does not work, see `conv-background-agents` (Bob and native subagent launches).
+
+Parent must not edit code in this worktree while the coder is active. Parent may read, monitor, plan, or launch a concurrent reviewer (reviewer reads committed history only).
+
+### Post-steps
+
+None. Commits land on the branch directly.
+
+---
+
+## Non-default setups — own-worktree and checkout-branch
+
+Full mechanics (branch prep, launch flags, post-steps, PR-branch cleanliness) are in
+`conventions/worktree-delegation.md`. Read only the section you need.
+
+---
+
+## Rules
+
+1. Every worker has a role and a mission — never overstep it.
+2. One task at a time — do not batch multiple tasks into one agent expecting it to self-sequence.
+3. Each task gets a written, committed task file before the worker starts.
+4. Each task lands as its own commit — not batched, not squashed.
+5. Coder ledger: every coder maintains a focused ledger in `.session/`. Never in a PR branch.
+6. **Wait-for-instructions mode:** task file may instruct the coder to hold open after reporting done and wait for further instruction on `In:`, rather than exiting. Useful for checkout-branch. The parent (not the coder) terminates.
+7. **Design-validation checkpoint** (hard stop): coder proposes code-level design inside the task file, publishes to `Out:`, and does not proceed to implementation until the mission owner explicitly approves.
+8. **Executor is binding:** if the user specifies who performs a task, that is binding. Do not substitute without stopping to ask first.
+9. Before starting the next task, verify the current task's completion: reviewed, meets done criteria, committed. Do not re-run tests — that is the reviewer's job.
+10. Integrate approved work by cherry-pick onto the mission branch. Never merge a coder worktree directly.
+11. Coder and reviewer must never create or modify `.claude/settings.json` or `.claude/settings.local.json`.
+12. Workers output to files only — no long content in chat. Return a short pointer plus one-line status.
+13. Never push or publish to GitHub without explicit per-operation authorization.
+14. **Do not replace the delegate's work.** If a delegated agent's output is suspect, do not verify, repair, or redo it yourself in the delegating session. Re-dispatch the same agent type once to verify and fix its own output and report a summary. If that attempt does not resolve it, do not retry. Escalate to the user; the fix may need a new agent for the failing tool.
+15. **Agentbus:** every worker uses agentbus. Workers are non-interactive by default; the user talks to the mission owner. Use a foreground worker when real-time steering is needed. Attach a background worker when mid-task guidance is needed.
+16. **No unprompted rebase.** A rebase is a normal coder task when the task file orders it and names the command. The git guard hook blocks the first attempt: the coder stops, reports the blocked command on `Out:`, and the parent asks the user. Only after the user approves that command does the parent tell the coder, on `In:`, to run it once more with the hook's override marker (see `conv-guard-hook`). The marker is never written into a task file. A coder or PR-prep agent never rebases on its own because a branch looks stale: it reports the moved base to the parent.
+
+## Code reviewer
+
+- Reads commits from the coder's branch as they land — does not wait for all coding to finish.
+- If coder diverges from task, reviewer notifies mission owner immediately.
+- Review output goes to a file in the mission owner's `.session/`, not the coder's worktree.
+- A narrowly scoped PR-prep agent (rebase, lint, DCO, test) needs no reviewer, no state file, no ledger. A rebase is run only as rule 16 says.
+- Default launch: Claude Code on CurveBender with `rits/zai-org/glm-5-3`, a different model from the coder's, in the coder launch form above. Optionally run `/code-review` in this Claude session as a final check before a PR push. If a launch does not work, see `conv-background-agents`.

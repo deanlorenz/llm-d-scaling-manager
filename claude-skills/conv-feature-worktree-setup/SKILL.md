@@ -1,0 +1,171 @@
+---
+name: conv-feature-worktree-setup
+description: Use when creating or migrating a mission worktree, setting up .session/ layout, or fixing missing skill access in a worktree.
+---
+
+# conv-feature-worktree-setup
+
+**This skill runs as a subagent.** When triggered, spawn a subagent to execute the setup steps below. The subagent has its own context and can focus entirely on the mechanical work.
+
+## Caller instructions (run in your own session before spawning)
+
+1. Identify the mission name and full worktree path.
+2. Launch a subagent (`general-purpose`, `haiku`: the work is mechanical):
+   ```
+   Agent(
+     description: "Set up mission worktree",
+     prompt: "<the Subagent instructions block below, with MISSION_NAME and MISSION_WT filled in, plus the In:/Out: channels and the subscription command>",
+     subagent_type: "general-purpose",
+     model: "haiku"
+   )
+   ```
+   Assign `In:` `<mission>.setup.in` and `Out:` `<mission>.setup` (see `conv-agentbus`), and subscribe to `Out:` yourself. The subagent publishes a heartbeat after each numbered step.
+3. Wait for the subagent to report completion before continuing mission work.
+4. If the subagent reports a failure, address it before proceeding.
+
+---
+
+## Subagent instructions
+
+You are performing a one-time worktree setup for mission `MISSION_NAME` at path `MISSION_WT`.
+Follow these steps exactly. Stop and report any failure immediately.
+
+### 1. Create `.session/` layout
+
+```bash
+mkdir -p MISSION_WT/.session/ledger
+```
+
+Verify the directory exists. If `MISSION_WT/.session/STATE.md` already exists, do not overwrite it — skip to step 2.
+
+If STATE.md is missing, create a minimal one using the template from `worktrees/session-tracking/conventions/state-vs-ledger.md`. Fill in the Orientation fields only; leave Execution empty. Do not invent content.
+
+### 2. Commit `.session/` to the mission branch
+
+`.session/` must be tracked on the mission branch so it is recoverable via `git show`:
+
+```bash
+git -C MISSION_WT add .session/
+git -C MISSION_WT commit -m "chore: initialize .session/ layout for MISSION_NAME"
+```
+
+If nothing to commit (already tracked), skip.
+
+### 3. Set up `.claude/skills` dir-symlink
+
+Skill discovery does not walk above the worktree root — each worktree needs its own `.claude/skills` pointing at the shared skills source.
+
+**Check first:** if `MISSION_WT/.claude/skills` already exists and is a directory symlink resolving to `worktrees/session-tracking/claude-skills`, step 3 is already done — skip to step 4.
+
+**If `pr-review` is a tracked git file in this worktree** (run `git -C MISSION_WT ls-files .claude/skills/pr-review` to check), do not replace the `.claude/skills` directory — skip to step 4 and report this as a blocker.
+
+Otherwise, clear the old `.claude/skills` and create the dir-symlink. Never use `rm -rf`.
+
+- If `MISSION_WT/.claude/skills` is a symlink (to the wrong place): remove only that symlink with `rm MISSION_WT/.claude/skills`.
+- If it is a real directory: list it first with `ls -la MISSION_WT/.claude/skills`. Every entry must be a symlink; check with `find MISSION_WT/.claude/skills -mindepth 1 -maxdepth 1 ! -type l`, which must print nothing. If it prints anything, stop and report it. Otherwise remove each symlink by its exact path with `rm`, then `rmdir MISSION_WT/.claude/skills`.
+
+```bash
+# Create a single dir-symlink pointing to the shared skills dir.
+# Use an absolute path — relative paths break when the shell CWD is not the repo root.
+# Build it from the session-tracking worktree. Do not use `rev-parse --show-toplevel`: in a linked worktree that is the mission worktree itself.
+TRACKING=$(git -C MISSION_WT worktree list --porcelain | awk '/^worktree /{p=$2} /^branch refs\/heads\/session-tracking$/{print p}')
+SKILLS_ABS="$TRACKING/claude-skills"
+test -d "$SKILLS_ABS" || { echo "NO claude-skills in '$TRACKING'"; exit 1; }
+mkdir -p MISSION_WT/.claude
+ln -s "$SKILLS_ABS" MISSION_WT/.claude/skills
+```
+
+Exclude the symlink from git tracking (repo-shared exclude, not per-worktree):
+
+```bash
+EXCLUDE=$(git -C MISSION_WT rev-parse --git-common-dir)/info/exclude
+grep -qxF ".claude/skills" "$EXCLUDE" || echo ".claude/skills" >> "$EXCLUDE"
+```
+
+### 4. Verify all skills resolve
+
+```bash
+for skill in MISSION_WT/.claude/skills/*/; do
+  name=$(basename "$skill")
+  test -r "$skill/SKILL.md" || { echo "BROKEN: $name"; exit 1; }
+  printf '%s -> %s\n' "$name" "$(readlink -f "$skill/SKILL.md")"
+done
+```
+
+All resolved paths must be under `worktrees/session-tracking/claude-skills/`. Report any broken or mis-targeted link.
+
+### 4a. Set up `.bob` links
+
+Bob agents in the worktree need the custom-mode file and the `ledger-capture` skill. Both are links into `session-tracking` (relative targets), never copies, and never tracked.
+
+```bash
+TRACKING=$(git -C MISSION_WT worktree list --porcelain | awk '/^worktree /{p=$2} /^branch refs\/heads\/session-tracking$/{print p}')
+mkdir -p MISSION_WT/.bob/skills
+for pair in "custom_modes.yaml:bob/custom_modes.yaml" "skills/ledger-capture:claude-skills/ledger-capture"; do
+  link="MISSION_WT/.bob/${pair%%:*}"; target="$TRACKING/${pair#*:}"
+  if [ -L "$link" ] && [ "$(readlink -f "$link")" = "$(readlink -f "$target")" ]; then continue; fi
+  if [ -e "$link" ] || [ -L "$link" ]; then echo "EXISTS, differs: $link"; exit 1; fi
+  ln -s "$(realpath --relative-to="$(dirname "$link")" "$target")" "$link"
+done
+```
+
+If a link path already exists and is not the expected link, stop and report it. Do not replace it. Exclude `.bob` from git tracking in the repo-shared exclude, as for `.claude/skills`:
+
+```bash
+grep -qxF ".bob" "$EXCLUDE" || echo ".bob" >> "$EXCLUDE"
+```
+
+Also exclude claimed `.wip` files (`conv-wip-editing`), as a safety; the main safety is the exact-path `git add`:
+
+```bash
+grep -qxF "*.wip" "$EXCLUDE" || echo "*.wip" >> "$EXCLUDE"
+```
+
+### 5. Create session-tracking convenience symlinks
+
+This is the one case where a new session writes directly into `session-tracking`. Create only these two links. Never commit them — only `policy-writer` commits them.
+
+Build each link target as a relative path computed from the link's own directory. Never write `MISSION_WT` or any absolute path into a link.
+
+```bash
+TRACKING=$(git -C MISSION_WT worktree list --porcelain | awk '/^worktree /{p=$2} /^branch refs\/heads\/session-tracking$/{print p}')
+LINKDIR="$TRACKING/missions/MISSION_NAME"
+# Check first, create nothing yet. An old-layout missions/<name>/ may still hold real files or a real directory:
+# `ln -sfn` would replace a real file, and would put the link inside a real directory.
+for name in STATE.md ledgers; do
+  if [ -e "$LINKDIR/$name" ] && [ ! -L "$LINKDIR/$name" ]; then
+    echo "REAL FILE OR DIRECTORY (old layout): $LINKDIR/$name. No link created."; exit 1
+  fi
+done
+mkdir -p "$LINKDIR"
+for pair in "STATE.md:.session/STATE.md" "ledgers:.session"; do
+  name=${pair%%:*}; target=${pair#*:}
+  rel=$(realpath --relative-to="$LINKDIR" "MISSION_WT/$target")
+  if [ -L "$LINKDIR/$name" ] && [ "$(readlink -f "$LINKDIR/$name")" != "$(readlink -f "MISSION_WT/$target")" ]; then
+    echo "MISMATCH: $LINKDIR/$name already exists with a different target"; exit 1
+  fi
+  ln -sfn "$rel" "$LINKDIR/$name"
+  test "$(readlink -f "$LINKDIR/$name")" = "$(readlink -f "MISSION_WT/$target")" || { echo "BROKEN: $name"; exit 1; }
+done
+```
+
+If a link already exists with a different target, stop and report it. Do not replace it.
+
+If the check reports a real file or directory, create no link at all and report it. `policy-writer` converts that `missions/MISSION_NAME/` to links after the mission's `.session/` is committed on its branch and every old file is checked against it.
+
+Then publish on agentbus so policy-writer knows the links are waiting to be committed:
+
+```
+agentbus_publish(topic="session-tracking.pending-commits", from_session="<slug>", kind="note",
+  body="mission=MISSION_NAME symlinks created in missions/MISSION_NAME/, ready to commit")
+```
+
+### 6. Report back
+
+Return a summary:
+- `.session/` layout: created / already existed
+- `.claude/skills` dir-symlink: created / already existed / blocked (pr-review tracked)
+- Skills verified: list of skills, resolved paths
+- session-tracking symlinks: created / already existed (same target) / mismatch (stopped, not replaced)
+- agentbus note: published / skipped (if agentbus unavailable)
+- Any failures encountered
