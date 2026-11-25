@@ -52,8 +52,9 @@
   rr-2 RESULT (2026-11-25, `.session/review-staleness-2026-11-25.md`): the new rules ARE the newest that exist (old policy-writer
   d23d9d7e3 and old session-tracking 36d27bcfb have identical trees; nothing newer anywhere in the old repo). rr-1 was partly
   wrong/stale (e.g. PR-prep rebase claim). Findings B2, B4-B7 exist identically in the old repo: suggestion-box material, not
-  migration. Migration-specific: `missions/` and `suggestion-box/` absent in the new session-tracking, and the old untracked
-  `claude-skills/pr-review` copy (made the skills dir-symlink work over upstream's tracked pr-review) is absent in the new one.
+  migration. Migration-specific: `missions/` and `suggestion-box/` absent in the new session-tracking, (user: the pr-review
+  question is settled: the whole `.claude/skills` folder is linked to `session-tracking/claude-skills`, upstream's `pr-review` is not
+  linked or handled per worktree; my earlier "missing untracked pr-review copy" item is withdrawn).
   `conventions/archived/` (11 files) was left behind on purpose.
 - [x] 5. `session-tracking` first install DONE 2026-11-25: root commit 194b528e from policy-writer@f00935a7 (34 files,
   tree ids verified equal, local, not pushed). It carries the rules BEFORE the review fixes (user, 2026-11-25: keep it,
@@ -70,7 +71,8 @@
   on `claude-global` (9774278, not pushed). The 7 old-repo-only notes stay archived in the old per-repo directory
   `~/.claude/projects/-home-dean-code-llm-d-dean-llmd-scaler-sandbox/memory/` (invisible to sessions). Draft kept in
   `.session/drafts/memory-global/`.
-- [ ] 9. Link older missions (in the old workspace) from the new `session-tracking` (needs the review decision D1: does
+- [ ] 9. Older missions: link them from the new `session-tracking`; and, once the new workspace works, decide which of them to
+  migrate or copy into it (migration scope, user 2026-11-25) (needs the review decision D1: does
   the `missions/` index live there; any write into `session-tracking` needs the user's go-ahead).
 
 **Last completed:** step 8 (global memory applied), after step 6 (this worktree). Earlier today: global config tracked
