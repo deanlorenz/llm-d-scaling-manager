@@ -57,9 +57,14 @@ Skill discovery does not walk above the worktree root — each worktree needs it
 
 **Check first:** if `MISSION_WT/.claude/skills` already exists and is a directory symlink resolving to `session-tracking/claude-skills`, step 3 is already done — skip to step 4.
 
-**If `pr-review` is a tracked git file in this worktree** (run `git -C MISSION_WT ls-files .claude/skills/pr-review` to check), do not replace the `.claude/skills` directory — skip to step 4 and report this as a blocker.
+**A worktree cut from the project's `main` has a real `.claude/skills/` that holds the project's upstream skills as tracked files (for example `pr-review`).** This is not a blocker. Upstream skills are disabled by default by not linking them; a session never edits upstream content and never commits, stages, ignores or asks about their removal. Do this once for the worktree:
 
-Otherwise, clear the old `.claude/skills` and create the dir-symlink. Never use `rm -rf`.
+1. List them: `git -C MISSION_WT ls-files .claude/skills`. If it prints nothing, skip to the next paragraph. Check that none is modified: `git -C MISSION_WT status --short -- .claude/skills` must print nothing; otherwise stop and report it.
+2. Mark each listed file as assumed unchanged, so git does not report their removal: `git -C MISSION_WT ls-files -z .claude/skills | xargs -0 git -C MISSION_WT update-index --assume-unchanged --`. This changes the local index only.
+3. Remove them locally: `rm` each listed file by its exact path, then `rmdir` each directory that is now empty, deepest first, ending with `MISSION_WT/.claude/skills`. Never `rm -rf`.
+4. Continue below. An upstream skill the user chose to keep is linked inside `session-tracking/claude-skills` (a link to `main/.claude/skills/<name>`) and shows up through the dir-symlink; every other upstream skill stays disabled.
+
+Then clear whatever is left of the old `.claude/skills` and create the dir-symlink. Never use `rm -rf`.
 
 - If `MISSION_WT/.claude/skills` is a symlink (to the wrong place): remove only that symlink with `rm MISSION_WT/.claude/skills`.
 - If it is a real directory: list it first with `ls -la MISSION_WT/.claude/skills`. Every entry must be a symlink; check with `find MISSION_WT/.claude/skills -mindepth 1 -maxdepth 1 ! -type l`, which must print nothing. If it prints anything, stop and report it. Otherwise remove each symlink by its exact path with `rm`, then `rmdir MISSION_WT/.claude/skills`.
@@ -164,7 +169,7 @@ agentbus_publish(topic="session-tracking.pending-commits", from_session="<slug>"
 
 Return a summary:
 - `.session/` layout: created / already existed
-- `.claude/skills` dir-symlink: created / already existed / blocked (pr-review tracked)
+- `.claude/skills` dir-symlink: created / already existed; tracked upstream skills marked assume-unchanged and removed locally: <n> (0 when the worktree was not cut from `main`)
 - Skills verified: list of skills, resolved paths
 - session-tracking symlinks: created / already existed (same target) / mismatch (stopped, not replaced)
 - agentbus note: published / skipped (if agentbus unavailable)

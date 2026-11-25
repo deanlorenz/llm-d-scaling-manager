@@ -13,7 +13,7 @@ description: Use when installing conventions, skills, or CONVENTIONS.md from pol
 
 - Production paths: `CONVENTIONS.md`, `conventions/`, `claude-skills/`, `bob/`. Nothing else is installed.
 - Never installed: `backup_rules/`, `.session/`, `.claude/`, `*.bak`, or any other path.
-- Ignore `claude-skills/pr-review` in every check below. It is an upstream skill, left untracked on `session-tracking`. Do not stage, move, or delete it.
+- Ignore the upstream-skill links in every check below: an upstream skill the user chose to keep is an untracked symlink in `claude-skills/` (a link to `main/.claude/skills/<name>`). Do not stage, move, or delete it. With none, the variables `UP` and `XP` below are empty.
 
 ## Caller instructions
 
@@ -51,6 +51,13 @@ PATHS="CONVENTIONS.md conventions claude-skills bob"
 
 Entering `$ST` with `cd` is permitted for this authorized operation. Use `$HEAD_SHA`, not the branch name, for the whole procedure.
 
+From `$ST`, once, build the exclusions for the upstream-skill links:
+
+```bash
+UP=$(for l in claude-skills/*; do test -L "$l" && printf ' :!%s' "$l"; done)
+XP=$(for l in claude-skills/*; do test -L "$l" && printf ' -x %s' "$(basename "$l")"; done)
+```
+
 Subscribe to your `In:` channel and stay subscribed. After each of Steps 1-6, publish `kind="heartbeat"` on `Out:`, body `session=<slug> step=<i>/7 <what you just did>`; send the Step 7 report on `Out:` too. Answer any request from `In:` on `Out:`.
 
 ### Step 1: Verify nothing uncommitted would be overwritten
@@ -61,10 +68,10 @@ In `$PW`: the production paths must have no uncommitted changes.
 git status --short -- $PATHS
 ```
 
-In `$ST`: the production paths must have no uncommitted or untracked changes, apart from `claude-skills/pr-review`.
+In `$ST`: the production paths must have no uncommitted or untracked changes, apart from the upstream-skill links in `claude-skills/`.
 
 ```bash
-git status --short -- $PATHS ':!claude-skills/pr-review'
+git status --short -- $PATHS $UP
 ```
 
 Stop if either prints anything. Untracked files elsewhere in `$ST` (mission links, suggestion-box files) do not block the install and must not be touched.
@@ -80,7 +87,7 @@ The install commit message contains `from policy-writer@<sha>`. Call that `LAST_
 `session-tracking` must still match what was last installed. From `$ST`:
 
 ```bash
-git diff $LAST_SHA HEAD --stat -- $PATHS ':!claude-skills/pr-review'
+git diff $LAST_SHA HEAD --stat -- $PATHS $UP
 ```
 
 (`$LAST_SHA` is a `policy-writer` commit; the diff compares its tree to the current `session-tracking` HEAD.)
@@ -168,16 +175,16 @@ Later installs use Steps 1-7 as written: `LAST_SHA` is the `$HEAD_SHA` of this f
 From `$ST`:
 
 ```bash
-diff -r -x pr-review $PW/claude-skills claude-skills
+diff -r $XP $PW/claude-skills claude-skills
 diff -r $PW/conventions conventions
 diff $PW/CONVENTIONS.md CONVENTIONS.md
 diff -r $PW/bob bob
 git diff --name-only <ST HEAD before step 4> HEAD
 git ls-files | grep -E '(^backup_rules/|^\.session/|^\.claude/|\.bak$)' || echo none
-grep -rohE 'conventions/[A-Za-z0-9_-]+\.md' CONVENTIONS.md conventions claude-skills | sort -u | while read f; do test -f "$f" || echo "MISSING $f"; done
+grep -rohE 'conventions/[A-Za-z0-9_-]+\.md' CONVENTIONS.md conventions claude-skills --exclude-dir=archived | sort -u | while read f; do test -f "$f" || echo "MISSING $f"; done
 ```
 
-The four `diff` commands must print nothing. Every name from `git diff --name-only` must be inside the production paths. The `git ls-files` command must print `none`. The last command (dangling references) must print nothing: every `conventions/<name>.md` cited in production must exist. If anything else appears, stop and report.
+The four `diff` commands must print nothing. Every name from `git diff --name-only` must be inside the production paths. The `git ls-files` command must print `none`. The last command (dangling references) must print nothing: every `conventions/<name>.md` cited in production must exist outside `conventions/archived/`. If anything else appears, stop and report.
 
 ### Step 6: Install commit
 
