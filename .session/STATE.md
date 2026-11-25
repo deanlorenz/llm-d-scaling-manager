@@ -48,18 +48,22 @@
   worktree, and upstream main's own CLAUDE.md = "see @AGENTS.md" loads as well), `llm-d-scaling-manager.code-workspace`
   (session-tracking first), `repo/info/exclude` entries (`.claude/skills`, `.bob`, `*.wip`). Skills links only AFTER
   the first install (user, 2026-11-25).
-- [ ] 8. Memory: global memory design approved in principle (user wants repo-agnostic notes global). Draft:
-  `.session/drafts/memory-global/` (15 generic notes + statusline note + new MEMORY.md). Tested:
-  `autoMemoryDirectory` is honored. To apply (diff first): copy into `~/.claude/memory/`, set
-  `autoMemoryDirectory` in profiles/main.json, alt.json and settings.json; delete the stale `~/.claude/memory/index.md`.
+- [x] 8. Memory (applied 2026-11-25): one global auto-memory directory `~/.claude/memory/` (15 generic notes +
+  statusline note, rebuilt MEMORY.md, stale index.md removed), `autoMemoryDirectory` set in profiles/main.json,
+  alt.json and the live settings.json; verified from `main`, the container root and the old workspace. Committed
+  on `claude-global` (9774278, not pushed). The 7 old-repo-only notes stay archived in the old per-repo directory
+  `~/.claude/projects/-home-dean-code-llm-d-dean-llmd-scaler-sandbox/memory/` (invisible to sessions). Draft kept in
+  `.session/drafts/memory-global/`.
 - [ ] 9. Link older missions (in the old workspace) from the new `session-tracking`; blocked by 5.
 
-**Last completed:** step 6 (this worktree). Earlier today: global config tracked on `claude-global` (pushed, private
-repo), profiles/apiKeyHelper, autoMode rewritten, harvest hook fixed, rules review rr-1.
+**Last completed:** step 8 (global memory applied), after step 6 (this worktree). Earlier today: global config tracked
+on `claude-global` (private repo; first 3 commits pushed), profiles/apiKeyHelper, autoMode rewritten, harvest hook
+fixed, rules review rr-1.
 
-**Next step / resume point:** ask the user which to take first: (a) the review decisions D1, D2, D4, D5 then fixes in
-`policy-writer` (4a), (b) apply the global memory plan (8), (c) steps 7 and 9 pieces that do not depend on the install.
-Do not start any of them unasked.
+**Next step / resume point:** ask the user which to take first: (a) the review decisions D1, D2, D4, D5, then the
+fixes in `policy-writer` (4a); (b) the pieces of step 7 that do not depend on the install (root `CLAUDE.md`,
+`.code-workspace`, `repo/info/exclude`); (c) pushing `claude-global` (2 commits ahead: README, memory). Do not start
+any of them unasked. The suggestion-box draft (`.session/drafts/suggestion-box-2026-11-25-1800.md`) is not submitted.
 
 ### Status
 
