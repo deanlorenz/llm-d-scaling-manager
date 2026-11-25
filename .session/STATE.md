@@ -67,8 +67,7 @@
   APPLIED 2026-11-25 in policy-writer: 4c88ee8a (row 73: resume-mission no longer says "the main repository"; its row-9 hunks were reverted in b87fc250: the
   `conventions/archived/` exception stays, the policy-writer may archive rules later) and b87fc250 (user: fix all pr-review-related rules: setup skill Step 3
   no longer blocks on a tracked upstream skill: assume-unchanged + remove locally + link the folder, tested on a scratch clone of `main`; install skill exempts
-  any untracked upstream-skill link instead of the name `pr-review`; CONVENTIONS.md layout line; policy-writer.md slip). NOT yet installed into session-tracking
-  (user: D2 "wait" = no incremental install yet). CONTRIBUTING.md is NOT wanted in every context: removed from the root CLAUDE.md; maybe when starting a PR branch,
+  any untracked upstream-skill link instead of the name `pr-review`; CONVENTIONS.md layout line; policy-writer.md slip). INSTALLED into session-tracking 2026-11-25 (user: "Install the changes to session tracking"): cherry-picks 7f9416fc, e1f641ef + install commit 12308619 (from policy-writer@b87fc250); tree ids equal, local, not pushed. CONTRIBUTING.md is NOT wanted in every context: removed from the root CLAUDE.md; maybe when starting a PR branch,
   probably only when creating reviewer or tester tasks (user; a candidate suggestion). rr-5 (`.session/task-rr-5.md`) maps the 32 suggestions to what the old policy-writer decided.
   rr-3 RESULT (2026-11-25; `.session/review-rules-verified-2026-11-25.md`, suggestion drafts `.session/drafts/suggestions-from-rr3-2026-11-25.md`):
   all 84 rr-1 findings re-checked on the actual lines: 66 CONFIRMED, 7 FALSE, 11 STALE. Of the 66: 53 rule-quality items that exist
@@ -78,7 +77,7 @@
   longer exists as a checkout in the flat layout). Those two are also rule edits: they go to the suggestion box, not into the migration.
   Also noted: `conv-feature-worktree-setup` L60 still says to report a tracked pr-review as a blocker, against the settled decision (old
   policy-writer STATE.md L35-36, spec-policy-writer.md T6).
-- [x] 5. `session-tracking` first install DONE 2026-11-25: root commit 194b528e from policy-writer@f00935a7 (34 files,
+- [x] 5. `session-tracking` first install DONE 2026-11-25 (second, incremental install 12308619 the same day): root commit 194b528e from policy-writer@f00935a7 (34 files,
   tree ids verified equal, local, not pushed). It carries the rules BEFORE the review fixes (user, 2026-11-25: keep it,
   option 1): the fixes of 4a go through `policy-writer` and reach `session-tracking` by normal incremental installs
   (cherry-picks, `LAST_SHA` = f00935a7). The "first install" authorization is consumed.
