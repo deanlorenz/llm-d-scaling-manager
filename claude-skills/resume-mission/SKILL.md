@@ -302,6 +302,6 @@ rename needed. (`conv-wip-editing` applies only to files you do not own.)
    Append to it as you work throughout this session.
 5. Register the ledger for the ledger harvester (Claude sessions; the command says "not registered" and exits 0 when
    there is no session id):
-   `python3 -I "$TRACKING/claude-skills/ledger-harvest/harvest-registry.py" register "${CLAUDE_CODE_SESSION_ID:-}" "$MISSION_WT/.session/<slug>.md"`
+   `python3 -I "$HOME/.claude/bin/ledger-harvest/harvest-registry.py" register "${CLAUDE_CODE_SESSION_ID:-}" "$MISSION_WT/.session/<slug>.md"`
    If it refuses because the session is already registered for another ledger, stop and tell the user. Do not
    overwrite the entry; the session is continuing and `harvest-registry.py start-next` handles that.

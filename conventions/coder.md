@@ -16,7 +16,7 @@
 - Maintain a session ledger (`.session/<slug>.md`) — progress, decisions, alternatives,
   completed checklist items.
 - Register your ledger for the ledger harvester when you create it (Claude sessions):
-  `HP="$(git worktree list --porcelain | awk '/^worktree /{p=$2} /^branch refs\/heads\/session-tracking$/{print p}')/claude-skills/ledger-harvest/harvest-registry.py"; python3 -I "$HP" register "${CLAUDE_CODE_SESSION_ID:-}" "<Path from your task file>/.session/<slug>.md"`.
+  `HP="$HOME/.claude/bin/ledger-harvest/harvest-registry.py"; python3 -I "$HP" register "${CLAUDE_CODE_SESSION_ID:-}" "<Path from your task file>/.session/<slug>.md"`.
   Use the `Path` of your task file for the ledger, not the current directory.
   If it refuses, report it to the parent on `Out:` and do not overwrite the entry.
 - For rebases or multi-file refactors: follow the plan in the task file (location checklist,

@@ -84,7 +84,7 @@ A session is registered when `resume-mission` Step 10 or `coder.md` registered i
 The session's current directory may not be a mission worktree, so never call the helper through a relative `.claude/skills/...` path. Build its absolute path in the same Bash call as the command (shell variables do not carry over between calls):
 
 ```bash
-HP="$(git worktree list --porcelain | awk '/^worktree /{p=$2} /^branch refs\/heads\/session-tracking$/{print p}')/claude-skills/ledger-harvest/harvest-registry.py"
+HP="$HOME/.claude/bin/ledger-harvest/harvest-registry.py"
 python3 -I "$HP" close "${CLAUDE_CODE_SESSION_ID:-}" --wait 300
 ```
 
