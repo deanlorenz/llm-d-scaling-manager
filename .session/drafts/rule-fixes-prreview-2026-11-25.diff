@@ -1,0 +1,130 @@
+diff -ru old/CONVENTIONS.md new/CONVENTIONS.md
+--- old/CONVENTIONS.md	2026-11-25 20:55:39.614816614 +0200
++++ new/CONVENTIONS.md	2026-11-25 20:55:39.615878023 +0200
+@@ -60,7 +60,7 @@
+     resume-mission/SKILL.md
+     wind-down/SKILL.md
+     conv-*/SKILL.md                ← situational-rule skills (auto-invoked)
+-    pr-review/SKILL.md
++    <upstream-skill>/              ← optional: untracked link to an upstream skill kept from `main/.claude/skills`
+   bob/                             ← Bob custom modes; every worktree's .bob links here
+     custom_modes.yaml
+   missions/                        ← read-only convenience symlinks
+@@ -107,7 +107,7 @@
+ - **No in-place editing of anything**, except files you **100% own** — your own code file, your own plan, your own ledger append. Everything else: write new, then remove/replace old.
+ - Never remove a file you do not own or did not create without explicit permission.
+ - Before removing anything, verify its content is captured in the correct location. Do not lose data.
+-- Archiving, moving, or renaming a convention or skill file is removing. The commit lists where each part of its content went, and a grep for the old path finds no live reference.
++- Archiving, moving, or renaming a convention or skill file is removing. The commit lists where each part of its content went, and a grep for the old path finds no live reference outside `conventions/archived/`.
+ - Destructive actions need step-by-step approval: `git reset --hard`, `git rebase`, `rm -rf`, `git rm`, stash drop, and equivalents. A rebase needs the user's approval of the exact command each time; a PR branch is re-cut with `conv-pr-branch`, never rebased. If not 100% sure, preserve a backup first.
+ - Before any `rm` or `rm -rf`: list the exact files first (`ls -la <path>`), confirm each entry is a symlink or a file you created and own, and verify no untracked content would be lost. Never use `rm -rf` on a directory unless you own every file in it and have listed them all.
+ - Never edit files outside the mission and role you own.
+diff -ru old/claude-skills/conv-feature-worktree-setup/SKILL.md new/claude-skills/conv-feature-worktree-setup/SKILL.md
+--- old/claude-skills/conv-feature-worktree-setup/SKILL.md	2026-11-25 20:55:39.615433788 +0200
++++ new/claude-skills/conv-feature-worktree-setup/SKILL.md	2026-11-25 20:55:39.615964176 +0200
+@@ -57,9 +57,14 @@
+ 
+ **Check first:** if `MISSION_WT/.claude/skills` already exists and is a directory symlink resolving to `session-tracking/claude-skills`, step 3 is already done — skip to step 4.
+ 
+-**If `pr-review` is a tracked git file in this worktree** (run `git -C MISSION_WT ls-files .claude/skills/pr-review` to check), do not replace the `.claude/skills` directory — skip to step 4 and report this as a blocker.
++**A worktree cut from the project's `main` has a real `.claude/skills/` that holds the project's upstream skills as tracked files (for example `pr-review`).** This is not a blocker. Upstream skills are disabled by default by not linking them; a session never edits upstream content and never commits, stages, ignores or asks about their removal. Do this once for the worktree:
+ 
+-Otherwise, clear the old `.claude/skills` and create the dir-symlink. Never use `rm -rf`.
++1. List them: `git -C MISSION_WT ls-files .claude/skills`. If it prints nothing, skip to the next paragraph. Check that none is modified: `git -C MISSION_WT status --short -- .claude/skills` must print nothing; otherwise stop and report it.
++2. Mark each listed file as assumed unchanged, so git does not report their removal: `git -C MISSION_WT ls-files -z .claude/skills | xargs -0 git -C MISSION_WT update-index --assume-unchanged --`. This changes the local index only.
++3. Remove them locally: `rm` each listed file by its exact path, then `rmdir` each directory that is now empty, deepest first, ending with `MISSION_WT/.claude/skills`. Never `rm -rf`.
++4. Continue below. An upstream skill the user chose to keep is linked inside `session-tracking/claude-skills` (a link to `main/.claude/skills/<name>`) and shows up through the dir-symlink; every other upstream skill stays disabled.
++
++Then clear whatever is left of the old `.claude/skills` and create the dir-symlink. Never use `rm -rf`.
+ 
+ - If `MISSION_WT/.claude/skills` is a symlink (to the wrong place): remove only that symlink with `rm MISSION_WT/.claude/skills`.
+ - If it is a real directory: list it first with `ls -la MISSION_WT/.claude/skills`. Every entry must be a symlink; check with `find MISSION_WT/.claude/skills -mindepth 1 -maxdepth 1 ! -type l`, which must print nothing. If it prints anything, stop and report it. Otherwise remove each symlink by its exact path with `rm`, then `rmdir MISSION_WT/.claude/skills`.
+@@ -164,7 +169,7 @@
+ 
+ Return a summary:
+ - `.session/` layout: created / already existed
+-- `.claude/skills` dir-symlink: created / already existed / blocked (pr-review tracked)
++- `.claude/skills` dir-symlink: created / already existed; tracked upstream skills marked assume-unchanged and removed locally: <n> (0 when the worktree was not cut from `main`)
+ - Skills verified: list of skills, resolved paths
+ - session-tracking symlinks: created / already existed (same target) / mismatch (stopped, not replaced)
+ - agentbus note: published / skipped (if agentbus unavailable)
+diff -ru old/claude-skills/conv-install-to-session-tracking/SKILL.md new/claude-skills/conv-install-to-session-tracking/SKILL.md
+--- old/claude-skills/conv-install-to-session-tracking/SKILL.md	2026-11-25 20:55:39.615729075 +0200
++++ new/claude-skills/conv-install-to-session-tracking/SKILL.md	2026-11-25 20:55:39.616078147 +0200
+@@ -13,7 +13,7 @@
+ 
+ - Production paths: `CONVENTIONS.md`, `conventions/`, `claude-skills/`, `bob/`. Nothing else is installed.
+ - Never installed: `backup_rules/`, `.session/`, `.claude/`, `*.bak`, or any other path.
+-- Ignore `claude-skills/pr-review` in every check below. It is an upstream skill, left untracked on `session-tracking`. Do not stage, move, or delete it.
++- Ignore the upstream-skill links in every check below: an upstream skill the user chose to keep is an untracked symlink in `claude-skills/` (a link to `main/.claude/skills/<name>`). Do not stage, move, or delete it. With none, the variables `UP` and `XP` below are empty.
+ 
+ ## Caller instructions
+ 
+@@ -51,6 +51,13 @@
+ 
+ Entering `$ST` with `cd` is permitted for this authorized operation. Use `$HEAD_SHA`, not the branch name, for the whole procedure.
+ 
++From `$ST`, once, build the exclusions for the upstream-skill links:
++
++```bash
++UP=$(for l in claude-skills/*; do test -L "$l" && printf ' :!%s' "$l"; done)
++XP=$(for l in claude-skills/*; do test -L "$l" && printf ' -x %s' "$(basename "$l")"; done)
++```
++
+ Subscribe to your `In:` channel and stay subscribed. After each of Steps 1-6, publish `kind="heartbeat"` on `Out:`, body `session=<slug> step=<i>/7 <what you just did>`; send the Step 7 report on `Out:` too. Answer any request from `In:` on `Out:`.
+ 
+ ### Step 1: Verify nothing uncommitted would be overwritten
+@@ -61,10 +68,10 @@
+ git status --short -- $PATHS
+ ```
+ 
+-In `$ST`: the production paths must have no uncommitted or untracked changes, apart from `claude-skills/pr-review`.
++In `$ST`: the production paths must have no uncommitted or untracked changes, apart from the upstream-skill links in `claude-skills/`.
+ 
+ ```bash
+-git status --short -- $PATHS ':!claude-skills/pr-review'
++git status --short -- $PATHS $UP
+ ```
+ 
+ Stop if either prints anything. Untracked files elsewhere in `$ST` (mission links, suggestion-box files) do not block the install and must not be touched.
+@@ -80,7 +87,7 @@
+ `session-tracking` must still match what was last installed. From `$ST`:
+ 
+ ```bash
+-git diff $LAST_SHA HEAD --stat -- $PATHS ':!claude-skills/pr-review'
++git diff $LAST_SHA HEAD --stat -- $PATHS $UP
+ ```
+ 
+ (`$LAST_SHA` is a `policy-writer` commit; the diff compares its tree to the current `session-tracking` HEAD.)
+@@ -168,16 +175,16 @@
+ From `$ST`:
+ 
+ ```bash
+-diff -r -x pr-review $PW/claude-skills claude-skills
++diff -r $XP $PW/claude-skills claude-skills
+ diff -r $PW/conventions conventions
+ diff $PW/CONVENTIONS.md CONVENTIONS.md
+ diff -r $PW/bob bob
+ git diff --name-only <ST HEAD before step 4> HEAD
+ git ls-files | grep -E '(^backup_rules/|^\.session/|^\.claude/|\.bak$)' || echo none
+-grep -rohE 'conventions/[A-Za-z0-9_-]+\.md' CONVENTIONS.md conventions claude-skills | sort -u | while read f; do test -f "$f" || echo "MISSING $f"; done
++grep -rohE 'conventions/[A-Za-z0-9_-]+\.md' CONVENTIONS.md conventions claude-skills --exclude-dir=archived | sort -u | while read f; do test -f "$f" || echo "MISSING $f"; done
+ ```
+ 
+-The four `diff` commands must print nothing. Every name from `git diff --name-only` must be inside the production paths. The `git ls-files` command must print `none`. The last command (dangling references) must print nothing: every `conventions/<name>.md` cited in production must exist. If anything else appears, stop and report.
++The four `diff` commands must print nothing. Every name from `git diff --name-only` must be inside the production paths. The `git ls-files` command must print `none`. The last command (dangling references) must print nothing: every `conventions/<name>.md` cited in production must exist outside `conventions/archived/`. If anything else appears, stop and report.
+ 
+ ### Step 6: Install commit
+ 
+diff -ru old/conventions/policy-writer.md new/conventions/policy-writer.md
+--- old/conventions/policy-writer.md	2026-11-25 20:55:39.615046414 +0200
++++ new/conventions/policy-writer.md	2026-11-25 20:55:39.615920698 +0200
+@@ -3,7 +3,7 @@
+ Read this when acting in any role on the `policy-writer` mission.
+ 
+ The `policy-writer` mission is the owner of global policy: `CONVENTIONS.md`, `conventions/`, and
+-canonical `.claude/skills/` stored on the `session-tracking` branch.
++canonical `claude-skills/` stored on the `session-tracking` branch.
+ 
+ ## Working branch and production
+ 

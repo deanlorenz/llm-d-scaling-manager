@@ -64,7 +64,12 @@
   items: CONVENTIONS.md:63 lists `pr-review` in the layout; conv-feature-worktree-setup L60-65 and L167 treat a tracked pr-review as a blocker; conv-install-to-session-tracking
   L16/64/67/83/171 exempt a path that no longer exists; policy-writer.md:6 naming slip; NO rule describes the opt-in (link a chosen upstream skill from `main`
   into `session-tracking`) or the git index flag (`assume-unchanged`/`skip-worktree`) that keeps the old worktrees quiet. Same in the old rules (suggestion material, one consolidated entry; not a migration fix).
-  APPLIED 2026-11-25 in policy-writer (4c88ee8a): rows 9 and 73 corrections. NOT yet installed into session-tracking (needs the user's go-ahead for an incremental install).
+  APPLIED 2026-11-25 in policy-writer: 4c88ee8a (row 73: resume-mission no longer says "the main repository"; its row-9 hunks were reverted in b87fc250: the
+  `conventions/archived/` exception stays, the policy-writer may archive rules later) and b87fc250 (user: fix all pr-review-related rules: setup skill Step 3
+  no longer blocks on a tracked upstream skill: assume-unchanged + remove locally + link the folder, tested on a scratch clone of `main`; install skill exempts
+  any untracked upstream-skill link instead of the name `pr-review`; CONVENTIONS.md layout line; policy-writer.md slip). NOT yet installed into session-tracking
+  (user: D2 "wait" = no incremental install yet). CONTRIBUTING.md is NOT wanted in every context: removed from the root CLAUDE.md; maybe when starting a PR branch,
+  probably only when creating reviewer or tester tasks (user; a candidate suggestion). rr-5 (`.session/task-rr-5.md`) maps the 32 suggestions to what the old policy-writer decided.
   rr-3 RESULT (2026-11-25; `.session/review-rules-verified-2026-11-25.md`, suggestion drafts `.session/drafts/suggestions-from-rr3-2026-11-25.md`):
   all 84 rr-1 findings re-checked on the actual lines: 66 CONFIRMED, 7 FALSE, 11 STALE. Of the 66: 53 rule-quality items that exist
   identically in the old rules (32 suggestion drafts, NOT submitted: user said wait until the migration ends), 11 SETTLED (pr-review,

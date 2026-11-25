@@ -76,3 +76,12 @@ Still open:
 - [ ] 8. Memory approach decided and applied. (decided: global; not yet applied)
 - [ ] 9. Link older missions to the old worktree.
 Current status lives in STATE.md; this list is the plan as approved.
+
+## Lessons for future setups (from the migration, 2026-11-25)
+
+- Upstream skills (tracked in the project's `.claude/skills/`, for example `pr-review`) are disabled by default simply by not linking them. A worktree cut
+  from `main` is set up once: mark the tracked upstream skill files assume-unchanged, remove them locally, link `.claude/skills` to `session-tracking/claude-skills`.
+  An upstream skill that is kept is linked from `main/.claude/skills/<name>` into `session-tracking/claude-skills` (untracked). This is now in
+  `conv-feature-worktree-setup` Step 3 (policy-writer b87fc250); the old worktrees did it with the same index flag.
+- Project rules (`AGENTS.md`, `CONTRIBUTING.md`) are not loaded into every mission context; `CONTRIBUTING.md` only when a PR branch is started or reviewer/tester tasks are created.
+- Settings and tokens: see `~/.claude/README.md` (profiles, `apiKeyHelper`, the VS Code extension that rewrites `settings.json`).
