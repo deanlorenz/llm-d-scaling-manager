@@ -1,0 +1,58 @@
+diff -ru old/CONVENTIONS.md new/CONVENTIONS.md
+--- old/CONVENTIONS.md	2026-11-25 20:08:53.142918994 +0200
++++ new/CONVENTIONS.md	2026-11-25 20:08:53.152441071 +0200
+@@ -107,7 +107,7 @@
+ - **No in-place editing of anything**, except files you **100% own** — your own code file, your own plan, your own ledger append. Everything else: write new, then remove/replace old.
+ - Never remove a file you do not own or did not create without explicit permission.
+ - Before removing anything, verify its content is captured in the correct location. Do not lose data.
+-- Archiving, moving, or renaming a convention or skill file is removing. The commit lists where each part of its content went, and a grep for the old path finds no live reference outside `conventions/archived/`.
++- Archiving, moving, or renaming a convention or skill file is removing. The commit lists where each part of its content went, and a grep for the old path finds no live reference.
+ - Destructive actions need step-by-step approval: `git reset --hard`, `git rebase`, `rm -rf`, `git rm`, stash drop, and equivalents. A rebase needs the user's approval of the exact command each time; a PR branch is re-cut with `conv-pr-branch`, never rebased. If not 100% sure, preserve a backup first.
+ - Before any `rm` or `rm -rf`: list the exact files first (`ls -la <path>`), confirm each entry is a symlink or a file you created and own, and verify no untracked content would be lost. Never use `rm -rf` on a directory unless you own every file in it and have listed them all.
+ - Never edit files outside the mission and role you own.
+diff -ru old/claude-skills/conv-install-to-session-tracking/SKILL.md new/claude-skills/conv-install-to-session-tracking/SKILL.md
+--- old/claude-skills/conv-install-to-session-tracking/SKILL.md	2026-11-25 20:08:53.145145478 +0200
++++ new/claude-skills/conv-install-to-session-tracking/SKILL.md	2026-11-25 20:08:53.152635207 +0200
+@@ -174,10 +174,10 @@
+ diff -r $PW/bob bob
+ git diff --name-only <ST HEAD before step 4> HEAD
+ git ls-files | grep -E '(^backup_rules/|^\.session/|^\.claude/|\.bak$)' || echo none
+-grep -rohE 'conventions/[A-Za-z0-9_-]+\.md' CONVENTIONS.md conventions claude-skills --exclude-dir=archived | sort -u | while read f; do test -f "$f" || echo "MISSING $f"; done
++grep -rohE 'conventions/[A-Za-z0-9_-]+\.md' CONVENTIONS.md conventions claude-skills | sort -u | while read f; do test -f "$f" || echo "MISSING $f"; done
+ ```
+ 
+-The four `diff` commands must print nothing. Every name from `git diff --name-only` must be inside the production paths. The `git ls-files` command must print `none`. The last command (dangling references) must print nothing: every `conventions/<name>.md` cited in production must exist outside `conventions/archived/`. If anything else appears, stop and report.
++The four `diff` commands must print nothing. Every name from `git diff --name-only` must be inside the production paths. The `git ls-files` command must print `none`. The last command (dangling references) must print nothing: every `conventions/<name>.md` cited in production must exist. If anything else appears, stop and report.
+ 
+ ### Step 6: Install commit
+ 
+diff -ru old/claude-skills/resume-mission/SKILL.md new/claude-skills/resume-mission/SKILL.md
+--- old/claude-skills/resume-mission/SKILL.md	2026-11-25 20:08:53.143997554 +0200
++++ new/claude-skills/resume-mission/SKILL.md	2026-11-25 20:08:53.152588772 +0200
+@@ -19,7 +19,7 @@
+ Rules:
+ - Read canonical `CONVENTIONS.md` from `session-tracking` first.
+ - Read `conventions/session-start.md` second.
+-- Never use the main repository's copy as fallback.
++- Never use a copy of the rules from any worktree other than `session-tracking` as a fallback.
+ - Do not select a mission before reading both files.
+ - Do not ask to continue the task before verifying mission, role, worktree, and takeover status.
+ 
+@@ -66,7 +66,7 @@
+ - Verify `CONVENTIONS.md` and `conventions/session-start.md` were read.
+ - Verify role/mission rules required by STATE were read.
+ - Stop if either startup file is missing.
+-- Do not use the main repository as fallback.
++- Do not use any worktree other than `session-tracking` as a fallback for these files.
+ - Verify active worktree root and branch with `git worktree list`.
+ - Read the candidate worktree's `.session/STATE.md` directly.
+ 
+@@ -151,7 +151,7 @@
+ 
+ Rules:
+ - Resolved paths must be under `$TRACKING/claude-skills/`.
+-- Links into the main repository or missing links are invalid.
++- Links that resolve anywhere else, and missing links, are invalid.
+ - Repair links using `conv-feature-worktree-setup`.
+ - Do not copy skills into mission worktrees.
+ 
