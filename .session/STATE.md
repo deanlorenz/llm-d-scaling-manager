@@ -56,6 +56,14 @@
   question is settled: the whole `.claude/skills` folder is linked to `session-tracking/claude-skills`, upstream's `pr-review` is not
   linked or handled per worktree; my earlier "missing untracked pr-review copy" item is withdrawn).
   `conventions/archived/` (11 files) was left behind on purpose.
+  rr-3 RESULT (2026-11-25; `.session/review-rules-verified-2026-11-25.md`, suggestion drafts `.session/drafts/suggestions-from-rr3-2026-11-25.md`):
+  all 84 rr-1 findings re-checked on the actual lines: 66 CONFIRMED, 7 FALSE, 11 STALE. Of the 66: 53 rule-quality items that exist
+  identically in the old rules (32 suggestion drafts, NOT submitted: user said wait until the migration ends), 11 SETTLED (pr-review,
+  missions index/suggestion-box in session-tracking, harvester, profiles), 2 MIGRATION-caused rule-text leftovers (row 9: CONVENTIONS.md:110
+  names `conventions/archived/`, which was left behind on purpose; row 73: `resume-mission` L22/69/154 say "the main repository", which no
+  longer exists as a checkout in the flat layout). Those two are also rule edits: they go to the suggestion box, not into the migration.
+  Also noted: `conv-feature-worktree-setup` L60 still says to report a tracked pr-review as a blocker, against the settled decision (old
+  policy-writer STATE.md L35-36, spec-policy-writer.md T6).
 - [x] 5. `session-tracking` first install DONE 2026-11-25: root commit 194b528e from policy-writer@f00935a7 (34 files,
   tree ids verified equal, local, not pushed). It carries the rules BEFORE the review fixes (user, 2026-11-25: keep it,
   option 1): the fixes of 4a go through `policy-writer` and reach `session-tracking` by normal incremental installs
