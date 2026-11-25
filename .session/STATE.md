@@ -60,7 +60,11 @@
   `.session/drafts/rule-fixes-9-73-2026-11-25.diff` (CONVENTIONS.md:110, conv-install-to-session-tracking L177/L180, resume-mission L22/69/154);
   to be applied in `policy-writer` (after rr-4 finishes) and installed incrementally; (b) pr-review/upstream skills policy: upstream skills exist in
   `main/.claude/skills`; default = disabled by not linking; opt-in = link a chosen one from `main` into `session-tracking`; no pr-review memory note;
-  rr-4 (`.session/task-rr-4.md`, report `.session/review-pr-review-2026-11-25.md`) checks all rules against it.
+  rr-4 (`.session/task-rr-4.md`, report `.session/review-pr-review-2026-11-25.md`) checked all rules against it: RESULT: contradicting/dangling
+  items: CONVENTIONS.md:63 lists `pr-review` in the layout; conv-feature-worktree-setup L60-65 and L167 treat a tracked pr-review as a blocker; conv-install-to-session-tracking
+  L16/64/67/83/171 exempt a path that no longer exists; policy-writer.md:6 naming slip; NO rule describes the opt-in (link a chosen upstream skill from `main`
+  into `session-tracking`) or the git index flag (`assume-unchanged`/`skip-worktree`) that keeps the old worktrees quiet. Same in the old rules (suggestion material, one consolidated entry; not a migration fix).
+  APPLIED 2026-11-25 in policy-writer (4c88ee8a): rows 9 and 73 corrections. NOT yet installed into session-tracking (needs the user's go-ahead for an incremental install).
   rr-3 RESULT (2026-11-25; `.session/review-rules-verified-2026-11-25.md`, suggestion drafts `.session/drafts/suggestions-from-rr3-2026-11-25.md`):
   all 84 rr-1 findings re-checked on the actual lines: 66 CONFIRMED, 7 FALSE, 11 STALE. Of the 66: 53 rule-quality items that exist
   identically in the old rules (32 suggestion drafts, NOT submitted: user said wait until the migration ends), 11 SETTLED (pr-review,
