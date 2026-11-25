@@ -3,8 +3,9 @@
 ## Orientation
 
 - **Conventions:** `policy-writer/CONVENTIONS.md` (workspace root `/home/dean/code/llm-d/llm-d-scaling-manager`; the
-  production copy `session-tracking` is intentionally EMPTY until the first install, so read the rules from
-  `policy-writer/` for now; skills are not linked into this worktree yet: read `policy-writer/claude-skills/<name>/SKILL.md`)
+  production copy `session-tracking` got its first install on 2026-11-25 (194b528e, from policy-writer@f00935a7) and
+  is the place to read rules from; `policy-writer/` is where they are edited; skills are not linked into this worktree
+  yet (links come after the install, user decision): read `session-tracking/claude-skills/<name>/SKILL.md`)
   *(read this first, before any other file)*
 - **What / goal / mission:** Move our work to the new repo
   `https://github.com/llm-d-incubation/llm-d-scaling-manager`: flat workspace (container root, bare `repo/`, every
@@ -13,7 +14,7 @@
 - **Worktree:** `incubation-migration` (branch `incubation-migration`, orphan, `.session/` only; no code)
 - **Role / scope:** Mission owner. Each step needs its go-ahead; no pushes without per-operation approval.
   Writes only here, plus the new workspace (user-granted 2026-11-25: the new root and its worktrees) except
-  `session-tracking`, which stays empty until told.
+  `session-tracking`, which gets only installs of reviewed `policy-writer` commits (conv-install-to-session-tracking), no other writes.
 - **Ledger / log:** active `.session/<slug>.md`; captured retired `.session/ledger/<slug>.md`.
   ⚠ The previous sessions' ledgers are in the OLD workspace
   (`/home/dean/code/llm-d/dean-llmd-scaler-sandbox/worktrees/incubation-migration/.session/`): do not read them
@@ -40,9 +41,12 @@
 - [x] 4. New orphan `policy-writer`: 069380bd plain copy of old policy-writer@d23d9d7e3, d7ca66e8 path rewrite,
   f00935a7 ledger-harvest moved to `~/.claude/bin/ledger-harvest` (a machine tool). Rules NOT yet reviewed/fixed: see 4a.
 - [ ] 4a. Fix the new policy-writer rules from the review (`.session/review-rules-2026-11-25.md`): 5 blockers, 53 fixes.
-  Open decisions D1-D5 are at the end of the report; D3 (bootstrap before first install) goes to a suggestion-box entry.
-- [ ] 5. `session-tracking` via the first-install path of `conv-install-to-session-tracking`: worktree exists and is
-  EMPTY on purpose; "first install" authorization was given once and is unused. Only after 4a.
+  Open decisions D1-D5 are in the report, section "Open decisions for the user" (about line 122); D3 (bootstrap before
+  first install) goes to a suggestion-box entry (draft in `.session/drafts/`, not submitted).
+- [x] 5. `session-tracking` first install DONE 2026-11-25: root commit 194b528e from policy-writer@f00935a7 (34 files,
+  tree ids verified equal, local, not pushed). It carries the rules BEFORE the review fixes (user, 2026-11-25: keep it,
+  option 1): the fixes of 4a go through `policy-writer` and reach `session-tracking` by normal incremental installs
+  (cherry-picks, `LAST_SHA` = f00935a7). The "first install" authorization is consumed.
 - [x] 6. This worktree (created 2026-11-25); `.session/` ported
 - [ ] 7. Root `CLAUDE.md` (an anchor; tested: a root CLAUDE.md in the non-git container loads in every
   worktree, and upstream main's own CLAUDE.md = "see @AGENTS.md" loads as well), `llm-d-scaling-manager.code-workspace`
@@ -54,7 +58,8 @@
   on `claude-global` (9774278, not pushed). The 7 old-repo-only notes stay archived in the old per-repo directory
   `~/.claude/projects/-home-dean-code-llm-d-dean-llmd-scaler-sandbox/memory/` (invisible to sessions). Draft kept in
   `.session/drafts/memory-global/`.
-- [ ] 9. Link older missions (in the old workspace) from the new `session-tracking`; blocked by 5.
+- [ ] 9. Link older missions (in the old workspace) from the new `session-tracking` (needs the review decision D1: does
+  the `missions/` index live there; any write into `session-tracking` needs the user's go-ahead).
 
 **Last completed:** step 8 (global memory applied), after step 6 (this worktree). Earlier today: global config tracked
 on `claude-global` (private repo; first 3 commits pushed), profiles/apiKeyHelper, autoMode rewritten, harvest hook
@@ -67,7 +72,7 @@ any of them unasked. The suggestion-box draft (`.session/drafts/suggestion-box-2
 
 ### Status
 
-Workspace is usable: `main`, `policy-writer`, `session-tracking` (empty), `incubation-migration`. Agentbus: this
+Workspace is usable: `main`, `policy-writer`, `session-tracking` (first install done), `incubation-migration`. Agentbus: this
 workspace uses bus `llmd-sm`; publish ownership on `mission.incubation-migration` when you start.
 
 ### Known issues
