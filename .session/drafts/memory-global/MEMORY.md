@@ -1,0 +1,16 @@
+- [feedback-always-verify-never-from-memory](feedback_always_verify_never_from_memory.md) — Never answer factual questions about code/mission state from memory or from what a doc claims — always check the actual file/code directly f
+- [feedback-ask-questions-short-and-scannable](feedback_ask_questions_short_and_scannable.md) — AskUserQuestion question text must be short and scannable, not a context dump
+- [feedback-capture-conclusions-not-transcript](feedback_capture_conclusions_not_transcript.md) — How to persist decisions from a discussion: self-contained conclusions in the durable doc, not ledger transcript, and not just stated in cha
+- [feedback-dont-deprioritize-unexercised-paths](feedback_dont_deprioritize_unexercised_paths.md) — Never treat "my test run didn't exercise this code path" as a signal that it's unimportant, low-priority, or safe to defer.
+- [feedback-git-destructive-confirm](feedback_git_destructive_confirm.md) — Dean's standing preferences on destructive git ops, PR scoping, and commit-message craft
+- [feedback-name-doc-with-section-refs](feedback_name_doc_with_section_refs.md) — Every reference to a section of an older/other doc must name the doc (e.g
+- [feedback_never_answer_about_code_without_reading](feedback_never_answer_about_code_without_reading.md) — Never state what code does/doesn't do, or answer a question about code, without reading the actual code first — no exceptions for seemingly-
+- [feedback-never-assume-agent-types-no-push](feedback_never_assume_agent_types_no_push.md) — Ground rules — every session/agent has a role+mission, never overstep it or assign the wrong one; never push/publish without per-operation a
+- [feedback-never-broad-git-add](feedback_never_broad_git_add.md) — NEVER use a broad git add (git add ., -A, -u, dir/) — always name exact file paths
+- [feedback-never-deviate-from-approved-plan](feedback_never_deviate_from_approved_plan.md) — Once the user approves an explicit numbered plan, its exact steps are the complete boundary of authorized action -- no adjacent/small/obviou
+- [feedback-never-rm-rf-on-unowned](feedback_never_rm_rf_on_unowned.md) — NEVER rm -rf on anything not owned/created, even with user approval for the deletion — use rm on the exact listed file + rmdir for empty dir
+- [feedback-resolve-ambiguity-before-coder-dispatch](feedback_resolve_ambiguity_before_coder_dispatch.md) — Never pass an "A and/or B" or similarly optional spec instruction into a coder's task prompt verbatim — resolve it to one precise, checkab
+- [feedback-show-rendered-md-long-in-files](feedback_show_rendered_md_long_in_files.md) — Never show markdown drafts as code blocks in chat; long drafts go in a file, chat gets a short pointer
+- [feedback-situational-rule-trigger-is-explaining-not-just-acting](feedback_situational_rule_trigger_is_explaining_not_just_acting.md) — Not every explanation of a guarded mechanism is the situational-rule trigger — a "do you know how" question is fine to answer from judgmen
+- [feedback_stop_guessing_via_askuserquestion](feedback_stop_guessing_via_askuserquestion.md) — Offering multiple-choice guesses via AskUserQuestion is the same failure as guessing in prose when the true answer isn't actually known
+- [StatusLine PS1 Translator](statusline-ps1-translator.md) — Translate PS1 escapes to a dynamic status line for Claude Code's statusLine
