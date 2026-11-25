@@ -39,10 +39,14 @@
 - [x] 3. Worktree `main` (fast-forwarded to upstream 54e9f94b on 2026-11-25)
 - [x] 3a. Agentbus bus `llmd-sm` registered for the new root and tested (2026-11-25)
 - [x] 4. New orphan `policy-writer`: 069380bd plain copy of old policy-writer@d23d9d7e3, d7ca66e8 path rewrite,
-  f00935a7 ledger-harvest moved to `~/.claude/bin/ledger-harvest` (a machine tool). Rules NOT yet reviewed/fixed: see 4a.
-- [ ] 4a. Fix the new policy-writer rules from the review (`.session/review-rules-2026-11-25.md`): 5 blockers, 53 fixes.
-  Open decisions D1-D5 are in the report, section "Open decisions for the user" (about line 122); D3 (bootstrap before
-  first install) goes to a suggestion-box entry (draft in `.session/drafts/`, not submitted).
+  f00935a7 ledger-harvest moved to `~/.claude/bin/ledger-harvest` (a machine tool). Rules review and staleness check: see 4a.
+- [ ] 4a. Rules review (NOT a migration step; user, 2026-11-25): rr-1 (`.session/review-rules-2026-11-25.md`, 84 findings)
+  may be stale or partly wrong. rr-2 (`.session/task-rr-2.md`, report `.session/review-staleness-2026-11-25.md`) checks (A) whether
+  the new rules equal the newest rules that exist in the old workspace and (B) which rr-1 findings are already addressed.
+  Migration does NOT fix rules. Rule issues found along the way are written up as suggestion-box entries (drafts in
+  `.session/drafts/`, submitted after the migration, the user said wait) and fixed by a new policy-writer session. User ruling on
+  rr-1's decisions: D1 yes (the `missions/` index, suggestion box and pending-commits flow live in `session-tracking`);
+  D2, D4, D5 are rule-quality questions already handled in the old policy-writer mission, not migration decisions; D3 waits.
 - [x] 5. `session-tracking` first install DONE 2026-11-25: root commit 194b528e from policy-writer@f00935a7 (34 files,
   tree ids verified equal, local, not pushed). It carries the rules BEFORE the review fixes (user, 2026-11-25: keep it,
   option 1): the fixes of 4a go through `policy-writer` and reach `session-tracking` by normal incremental installs
@@ -65,8 +69,8 @@
 on `claude-global` (private repo; first 3 commits pushed), profiles/apiKeyHelper, autoMode rewritten, harvest hook
 fixed, rules review rr-1.
 
-**Next step / resume point:** ask the user which to take first: (a) the review decisions D1, D2, D4, D5, then the
-fixes in `policy-writer` (4a); (b) the pieces of step 7 that do not depend on the install (root `CLAUDE.md`,
+**Next step / resume point:** read the rr-2 staleness report and show the user its verdict; then ask which to take first:
+(a) re-sync `policy-writer` with the newest old rules if rr-2 finds it stale (a migration fix); (b) the pieces of step 7 that do not depend on the install (root `CLAUDE.md`,
 `.code-workspace`, `repo/info/exclude`); (c) pushing `claude-global` (2 commits ahead: README, memory). Do not start
 any of them unasked. The suggestion-box draft (`.session/drafts/suggestion-box-2026-11-25-1800.md`) is not submitted.
 
