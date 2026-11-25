@@ -101,6 +101,12 @@
 on `claude-global` (private repo; first 3 commits pushed), profiles/apiKeyHelper, autoMode rewritten, harvest hook
 fixed, rules review rr-1.
 
+**Suggestions (user, 2026-11-25):** the 32 suggestions are NOT worked here. The whole review is ONE suggestion for the new policy-writer mission, written to
+be read with no context from this session: `.session/drafts/suggestion-box-2026-11-25-rules-review.md` (35 items; constraint: few rules, shorten or refine, cheap on-demand
+rules only). NOT submitted: submitting = copying it to `session-tracking/suggestion-box/` (needs the user's word and the cross-worktree authorization). The older drafts
+`suggestion-box-2026-11-25-1800.md` (bootstrap before the first install: moot, the install is done) and `...-1830-bob-skills-link.md` (now item 33) and
+`suggestions-from-rr3-2026-11-25.md` (long form of items 1-32) are superseded by it or kept as its evidence.
+
 **Next step / resume point:** read the rr-2 staleness report and show the user its verdict; then ask which to take first:
 (a) re-sync `policy-writer` with the newest old rules if rr-2 finds it stale (a migration fix); (b) the pieces of step 7 that do not depend on the install (root `CLAUDE.md`,
 `.code-workspace`, `repo/info/exclude`); (c) pushing `claude-global` (2 commits ahead: README, memory). Do not start
