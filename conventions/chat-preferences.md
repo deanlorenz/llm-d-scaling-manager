@@ -1,0 +1,29 @@
+# Interactive Chat Preferences & Guidelines
+
+Read this when running as an interactive foreground session communicating with the human user.
+
+## Step-by-Step Execution & Approval Gates
+- **Do not jump ahead:** When working through a numbered list or multi-item plan, stop after each item, present results, and wait for explicit user review and approval before proceeding to the next item.
+- **Provide Line Numbers & Diffs:** Always provide exact file paths and line numbers (or diff blocks) when citing changes so modifications can be reviewed in place without searching.
+- **No Speculative Actions:** If an instruction or prompt is ambiguous, ask the user for clarification rather than making assumptions or running speculative scans.
+- **Discuss Before Applying:** Before editing code, a rule, or a skill, say in chat what changes, why, and which existing commands or text it replaces. Wait for approval. Reviewing the diff afterwards is not the gate.
+- **Do Not Re-ask Approved Changes:** Apply a change the user already approved. Do not list it again or ask for approval again.
+- **Ask Clearly:** A permission request names one action and the exact path, as a numbered item, with nothing else in the same item.
+
+## Output Style
+- Keep chat responses concise, structured, and technical.
+- Do not dump long code listings, whole files, or raw diffs into chat; write them to disk and return brief pointers with line numbers.
+- The user does not read raw tool output, background tool calls in particular. When a tool call or a background task finishes, state the important outcome in text: what it found, what changed, what it means, and anything the user must decide. Do not assume the user will look at the raw result. Say nothing about unimportant results. The ledger harvester relies on this: it reads the session's summary and looks at raw results only when the summary says they matter.
+- Writing to a ledger, STATE or a spec needs no matching chat line ("I just logged X"). Chat carries answers, questions and content for the user to react to.
+- When invoking tools prepend with WHAT/WHY invoked (one-liner md subsection) post append with bottom line (one-liner with icon)
+- Standard icon set — use consistently, not decoratively:
+  - 👉 something User should pay attention to (caveat, footgun, load-bearing detail)
+  - 💥 error / couldn't complete an action
+  - ❓ a direct question to User
+  - 🟡 a statement waiting on his confirmation before Claude proceeds
+  - ⏸️ this turn/task has reached a finished/done state, nothing further pending
+- H3 section headers on long or multi-tool-call responses, only the ones actually needed: 📋 Summary · ✅ Confirmed · 🚫 Rejected · ❓ Question · 🔍 Findings · ➡️ Next steps
+- Use Markdown formatting — numbered headers, bullets, bold, tables — so an answer's sections are visually distinct. Never flat prose paragraphs for anything with real structure.
+- Clear, short summaries:
+  - One-liner references to the numbered md headers with the same icons — should be clear what I need to know, what I need to go read/review, what I need to answer or decide, and what is blocking.
+  - Each line should be numbered — I want to be able to write my comments and refer to numbered items in the summary.

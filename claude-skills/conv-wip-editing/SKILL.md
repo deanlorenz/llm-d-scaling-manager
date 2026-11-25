@@ -1,0 +1,114 @@
+---
+name: conv-wip-editing
+description: Use when about to edit a file you don't own, or write a new file into a shared folder you don't own. Implements the .wip claim/edit/release protocol.
+---
+
+# conv-wip-editing
+
+**This skill runs as a subagent** when the edit is fully scoped — you know the exact file, the exact change, and the change is self-contained. The subagent claims the file, makes the edit, and releases it.
+
+If the edit requires judgment from your session's context (e.g. the content to write depends on decisions being made interactively), run the steps below in your own session instead.
+
+## Adding the file
+
+Always `git add <exact path>`. Never `git add .`, `-A` or `-u`.
+
+## Who owns a file
+
+- You own a file if you created it this session, or it is in your own mission worktree and no other active session was granted write access to it. Everything else you do not own: files in another worktree, shared convention files, another mission's STATE.
+- The exemption is identity-based, not dispatcher-based. The mission owner may edit its own STATE.md directly, without `.wip`. An agent the owner dispatches is not the owner and must use `.wip` on that file, whoever gave the instruction.
+- When dispatching an agent, say in its task file whether it needs `.wip` for the files it will touch. A coder writing new code files it creates does not. An agent updating a STATE.md it does not own does.
+
+## Caller instructions (sub-agent path)
+
+1. Confirm you know:
+   - The exact file path to edit
+   - The exact change to make (write it out before spawning)
+   - That no `.wip` lock already exists (`test ! -f <path>.wip`)
+2. Launch a subagent (`general-purpose`, `haiku`: the edit is mechanical):
+   ```
+   Agent(
+     description: "Edit <file> under .wip",
+     prompt: "<the Subagent instructions block below, with FILE_PATH and CHANGE_DESCRIPTION filled in, plus the In:/Out: channels and the subscription command>",
+     subagent_type: "general-purpose",
+     model: "haiku"
+   )
+   ```
+   Assign `In:` `<mission>.wip-<n>.in` and `Out:` `<mission>.wip-<n>` (see `conv-agentbus`), and subscribe to `Out:` yourself. The subagent publishes a heartbeat after each numbered step.
+3. Do not touch the file while the subagent holds the `.wip` lock.
+4. Verify the subagent committed before continuing.
+
+## In-session path (when judgment is needed)
+
+Follow the steps in the Subagent instructions directly in your own session.
+
+---
+
+## Subagent instructions — Case 1: Editing an existing file
+
+File: `FILE_PATH`
+Change: `CHANGE_DESCRIPTION`
+
+1. **Verify the file is tracked:**
+   ```bash
+   git ls-files FILE_PATH
+   ```
+   Must show the file. If empty — untracked — stop and report. Do not proceed.
+
+2. **Verify no existing `.wip` lock:**
+   ```bash
+   test ! -f FILE_PATH.wip || echo "LOCKED"
+   ```
+   If locked: stop and report. Do not proceed.
+
+3. **Claim — rename to `.wip`:**
+   ```bash
+   mv FILE_PATH FILE_PATH.wip
+   ```
+
+4. **Make the change** to `FILE_PATH.wip`.
+
+5. **Release — rename back:**
+   ```bash
+   mv FILE_PATH.wip FILE_PATH
+   ```
+
+6. **Commit:**
+   ```bash
+   git add FILE_PATH && git commit -m "<describe the change>"
+   ```
+
+7. Report: file path, commit SHA, one-line summary of change made.
+
+---
+
+## Subagent instructions — Case 2: Writing a new file into a shared folder
+
+Destination: `FILE_PATH`
+Content: `CHANGE_DESCRIPTION`
+
+1. **Verify the target does not already exist:**
+   ```bash
+   test ! -f FILE_PATH || echo "EXISTS"
+   git show HEAD:FILE_PATH 2>/dev/null && echo "IN HISTORY"
+   ```
+   If it exists on disk or in history: stop and report. This may be a rename, not a new file.
+
+2. **Claim the name:**
+   ```bash
+   touch FILE_PATH.wip
+   ```
+
+3. **Write the content** to `FILE_PATH.wip`.
+
+4. **Release:**
+   ```bash
+   mv FILE_PATH.wip FILE_PATH
+   ```
+
+5. **Commit:**
+   ```bash
+   git add FILE_PATH && git commit -m "<describe the new file>"
+   ```
+
+6. Report: file path, commit SHA, one-line summary.
