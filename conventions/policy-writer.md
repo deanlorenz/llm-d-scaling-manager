@@ -3,7 +3,7 @@
 Read this when acting in any role on the `policy-writer` mission.
 
 The `policy-writer` mission is the owner of global policy: `CONVENTIONS.md`, `conventions/`, and
-canonical `.claude/skills/` stored on the `session-tracking` branch.
+canonical `claude-skills/` stored on the `session-tracking` branch.
 
 ## Working branch and production
 
