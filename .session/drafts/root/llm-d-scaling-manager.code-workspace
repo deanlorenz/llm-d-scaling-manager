@@ -1,0 +1,20 @@
+{
+	"folders": [
+		{
+			"name": "session-tracking",
+			"path": "session-tracking"
+		},
+		{
+			"name": "policy-writer",
+			"path": "policy-writer"
+		},
+		{
+			"name": "main",
+			"path": "main"
+		},
+		{
+			"name": "incubation-migration",
+			"path": "incubation-migration"
+		}
+	]
+}

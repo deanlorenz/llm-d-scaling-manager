@@ -62,7 +62,7 @@
   (cherry-picks, `LAST_SHA` = f00935a7). The "first install" authorization is consumed.
 - [x] 6. This worktree (created 2026-11-25); `.session/` ported
 - [ ] 7. (partly done 2026-11-25: skills links, `.bob` links, `repo/info/exclude` entries, `missions/incubation-migration/` links and empty
-  `suggestion-box/` in `session-tracking` are in place, verified; STILL OPEN: root `CLAUDE.md`, `.code-workspace`) Root `CLAUDE.md` (an anchor; tested: a root CLAUDE.md in the non-git container loads in every
+  `suggestion-box/` in `session-tracking` are in place, verified; STILL OPEN: root `CLAUDE.md`, `.code-workspace`; drafts in `.session/drafts/root/`, not applied; `.bob/skills` is now a dir-link to `session-tracking/claude-skills` like `.claude/skills`, user 2026-11-25) Root `CLAUDE.md` (an anchor; tested: a root CLAUDE.md in the non-git container loads in every
   worktree, and upstream main's own CLAUDE.md = "see @AGENTS.md" loads as well), `llm-d-scaling-manager.code-workspace`
   (session-tracking first), `repo/info/exclude` entries (`.claude/skills`, `.bob`, `*.wip`). Skills links only AFTER
   the first install (user, 2026-11-25).
